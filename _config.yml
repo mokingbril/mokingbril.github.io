@@ -31,9 +31,7 @@ archive_dir: archives
 category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
-# 跳过文件夹下所有子文件夹和文件
 skip_render:
-  - "cshtml/**"
 
 # Writing
 new_post_name: :title.md # File name of new posts
