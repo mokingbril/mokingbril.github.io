@@ -112,13 +112,13 @@ var saveToLocal = {
     <script>(function () {  window.activateDarkMode = function () {
     document.documentElement.setAttribute('data-theme', 'dark')
     if (document.querySelector('meta[name="theme-color"]') !== null) {
-      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d'); $("#site-title").css("color", "#55555555");
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d'); document.getElementById("site-title").style.color = "#55555555";
     }
   }
   window.activateLightMode = function () {
     document.documentElement.setAttribute('data-theme', 'light')
    if (document.querySelector('meta[name="theme-color"]') !== null) {
-      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff'); $("#site-title").removeAttr("style");
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff'); document.getElementById("site-title").style.color = "#ffffff";
     }
   }
   const autoChangeMode = 'false'
