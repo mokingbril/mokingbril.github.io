@@ -405,6 +405,8 @@ document.addEventListener('pjax:send', function () {
     </div>
     <!--看板娘-->
     <script src="/live2d_models/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script>
-    <script>$.getScript("/js/anime.js");</script>
+    <script>$.getScript("/js/anime.js");
+      if($("body").width()>850){var currentIndex=0;function changeBg(){const bgImgs=["bg.jpg","chobits.jpg","dejimon.jpg","kekkaisensen.jpg","hidamari.jpg","LuckyStar.jpg","konosuba.png","hagaren.jpg","tsubasa.png","coil.jpg","L.Lawliet.jpg","suramu.png","berserk.jpg","kaguya.png","Isla.jpg","cat.returns.jpg","reborn.jpg","teatime.jpg","gochiusa.jpg","grisaia.jpg","bakuman.jpg","amagami.jpg","LittleBusters.jpg","d.gray.jpg","sola.jpg","maousama.jpg","bokuragaita.jpg","psycho-pass.jpg","yosuganosora.png"];$('#page-header').animate({opacity:0},1500,function(){if(currentIndex>=bgImgs.length)currentIndex=0;$(this).css("background-image","url(/media/bgImgs/"+bgImgs[currentIndex]+")").animate({opacity:1},2000)});currentIndex++}setInterval("changeBg()",15000)}
+    </script>
 </body>
 </html>
