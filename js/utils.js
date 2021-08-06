@@ -146,10 +146,12 @@ var btf = {
     }
   }
 }
-/* ÍøÒ×ÔÆÒôÀÖ */
+/* ç½‘æ˜“äº‘éŸ³ä¹ */
 var theme_anime = [];
 if (localStorage.getItem("theme_anime")) { theme_anime = JSON.parse(localStorage.getItem("theme_anime")); }
-if (theme_anime.length > 0 && theme_anime[0] != 1) {
-    if ((typeof jQuery != 'undefined')) { $(".aplayer").remove(); }
-    else if (document.getElementsByClassName('aplayer').length > 0) { document.getElementsByClassName('aplayer')[0].parentNode.removeChild(document.getElementsByClassName('aplayer')[0]); }
+if (theme_anime.length > 0 && theme_anime[0] == 0) {
+    document.addEventListener("DOMContentLoaded", function () {
+        if ((typeof jQuery != 'undefined')) { $(".aplayer").remove(); }
+        else if (document.getElementsByClassName('aplayer').length > 0) { document.getElementsByClassName('aplayer')[0].parentNode.removeChild(document.getElementsByClassName('aplayer')[0]); }
+    }, true);
 }
