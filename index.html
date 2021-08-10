@@ -426,8 +426,8 @@ document.addEventListener('pjax:send', function () {
 	        }
 		bg_img.addEventListener("load", function(){ 
                 	if ((currentIndex + 1) >= bgImgs.length) { setInterval("changeBg()", 15000); }
-			else if ((new Date()).setTime((new Date()).getTime() - bg_img.start) > 15000) { changeBg(); }
-                	else { setTimeout("changeBg()", 15000); }
+			else if ((new Date()).setTime((new Date()).getTime() - bg_img.start) > 10000) { changeBg(); }
+                	else { setTimeout("changeBg()", 10000); }
             	});
 		setTimeout("changeBg()", 15000);
         }
