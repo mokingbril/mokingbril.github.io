@@ -423,8 +423,7 @@ document.addEventListener('pjax:send', function () {
 			        currentIndex++;
 		        }
 	        }
-		$("#site-title")[0].ondblclick = function () { changeBg(); return false; }
-	        setInterval("changeBg()", 15000);
+		bg_img.addEventListener("load", function(){ setTimeout("changeBg()", 15000); });
         }
     </script>
 </body>
