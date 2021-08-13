@@ -1,0 +1,2368 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="description" content="墨☆尘的专属播放器" />
+    <title lang="pagetitle" class="label">墨☆尘的播放器</title>
+    <link id="icon" rel="shortcut icon" href="images/video.ico"/>
+    <!--CSS样式-->
+    <style type="text/css">
+        *{ margin: 0px;padding: 0px; }
+        body{ background-color:#323232; }
+        body,p {
+            transition: background 3s ease-in; -ms-transition: background 3s ease-in; -moz-transition: background 3s ease-in; 
+            -webkit-transition: background 3s ease-in; -o-transition: background 3s ease-in;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+        }
+        p{ color: white; text-align: center; background-color:#868383; height:35px; line-height:35px; }
+        ul{ list-style-type: none; }
+        
+        #videoBox{
+            margin:0 auto;
+            width: 800px; height: 570px;
+            text-align:center; border-radius: 15px;
+            position:absolute;top:50%;left:50%;
+            margin-top: -285px;margin-left: -400px;
+        }
+        #videoBox,#MyVideo,#videoFileName {
+            transition: width 0.5s,height 0.5s;
+            -ms-transition: width,height 0.5s;  -moz-transition: width,height 0.5s; 
+            -webkit-transition: width,height 0.5s; -o-transition: width,height  0.5s; 
+        }
+        #videoFileName{ z-index:15; width: 800px; height:30px; line-height:30px; }
+
+        #filesbox { border: 1px solid #ffffff; position:absolute; left:0; top:0; z-index:35; }
+        #filesbox input{float:left;}
+        #filesbox p{ width:260px; height:30px; }
+        #filesbox .Search{ float:left;width:255px; height:25px; font-style:italic;}
+        #filelistbox {
+            width:260px; height:475px; overflow:auto;
+            color:#D8E3E0;font-weight:bold;white-space: nowrap;   
+        }
+        #filelistbox li{ height:16px;
+            cursor:default; color:#D8E3E0;
+            font-size:14px; font-weight:bold;            
+            white-space: nowrap; list-style-type: none;
+        }
+        #filelistbox summary { cursor:default; 
+            -moz-user-select:none; -ms-user-select:none; 
+            -webkit-user-select:none; -o-user-select:none;
+         }
+
+        #toolbarbylist span {
+            cursor:pointer; margin-left:12px;
+            float:left; font-weight:bold;
+        }
+        #Openlist {
+            position: absolute; top: 515px; left: 15px;   
+            z-index:135; font: 13px/1.5 \5fae\8f6f\96c5\9ed1;
+        }
+
+        #toolbar{ margin:0 auto; text-align:center;  width: 800px; height:35px; z-index:15; }
+        #toolbar img {
+            -webkit-filter: grayscale(100%);  -moz-filter: grayscale(100%); -o-filter: grayscale(100%); 
+            filter: grayscale(100%); filter: gray; -ms-filter:grayscale(100%); 
+        }
+        
+        #rightMenu{
+            position: absolute; top: -9999px; left: -9999px;   
+            z-index:150; font: 12px/1.5 \5fae\8f6f\96c5\9ed1;         
+        }
+        #rightMenu ul,#Openlist{
+            float: left; padding: 2px;
+            border: 1px solid #979797;
+            box-shadow: 2px 2px 2px rgba(0, 0, 0, .6);
+            background: url(images/line.png) 24px 0 repeat-y #f1f1f1;            
+        }
+        #rightMenu ul li,#Openlist li{                       
+            height: 24px; line-height: 24px;
+            float: left; clear: both; cursor: pointer;            
+            padding:0 29px; white-space: nowrap;
+        }
+        #rightMenu ul li lable{ float: right; font-size: 10px; }
+        #rightMenu ul li.sub{
+            background-repeat: no-repeat;
+            background-position: right 9px;
+            background-image: url(images/arrow.png);
+        }
+        #rightMenu ul li.active{
+            background-color: #ffffff; border-radius: 3px; border: 1px solid #aecff7;
+            height: 22px; line-height: 22px; padding:0 30px;
+        }
+        #rightMenu ul ul{ display: none; position: absolute; }
+        #rightMenu ul li ul span li {width:120px;}
+        
+        #Settings,#messageBox,#playertip {
+            position:absolute; left:50%; top:50%;
+            
+            text-align:left; transition: transform 1.5s ease-in; 
+            -ms-transition: -ms-transform 1.5s ease-in; -moz-transition: -moz-transform 1.5s ease-in;            
+            -webkit-transition: -webkit-transform 1.5s ease-in;  -o-transition: -o-transform 1.5s ease-in;           
+        }
+        #SetBox{
+            /*width: 300px;*/  height: 230px;
+            background-color:Gray;
+            filter: alpha(opacity=70);
+            opacity: 0.7; -webkit-opacity:0.7; -moz-opacity:0.7;-ms-opacity:0.7; -o-opacity:0.7;
+            text-align:center; font-size: 14px; font-weight: bolder;
+        }
+        #SetBox .title {
+            text-align: left; padding-left: 10px; font-size: 11pt;
+            cursor: move; border-bottom: 1px solid #ffffff;
+            height: 25px; line-height: 25px;            
+        }
+        #SetBox .t1 { float: left; font-weight: bolder; text-decoration: none; }
+        #SetBox .t2,#messageBox .sysClose,#SetBox .t3 {
+            float: right; text-align: center; overflow: hidden;
+            line-height: 18px; height: 18px; width: 20px;            
+            margin-top: 3px; margin-right: 4px; padding:2px 0px 0px 0px;            
+            color:#E3E8E8; cursor: pointer; font-family:STCaiyun;
+        }
+        #SetBox .t2:hover,#messageBox .sysClose:hover{ color:#323232;background-color:#E3E8E8;} 
+        #SetBox .t3 { padding:0px;color:#ffffff;background-color:#2E75BD;font-family:宋体;border-radius:9px;}
+        #colors input[type="color"] {width:45px;height:20px;padding:0px;border:0 none;}
+
+        .radius15{border-radius:15px;}
+        .show{display:block;}
+        .hide{display:none;}
+        .ptype,.subtitled,.subtimeed{font-weight:bold;}
+        .bglabel{ background-color:#06A7E1;border:1px solid #29ADDB;}   #rd_screen label { cursor:pointer; }        
+        .transform360{ transform: rotateY(360deg); -ms-transform: rotateY(360deg); -moz-transform: rotateY(360deg); -webkit-transform: rotateY(360deg); -o-transform: rotateY(360deg); }
+        .transform180{transform: rotateY(180deg); -ms-transform: rotateY(180deg); -moz-transform: rotateY(180deg); -webkit-transform: rotateY(180deg); -o-transform: rotateY(180deg); }
+        .unselectable{ -moz-user-select:none; -ms-user-select:none; -webkit-user-select:none; -o-user-select:none;}
+        #messageBox { display:none;z-index:513;background-color:#FFFFFF;width:300px;height:150px;font-family:STCaiyun; border-radius:4px; }
+        #playertip { background-color:#323232;color:#ffffff;z-index:500;text-align:center; min-width:90px;height:33px;line-height:33px; border-radius:3px; white-space: nowrap; }
+        #poshytip-bubble { position: relative; background-color:Black; text-align:left; color: white; z-index:950;font-size:12px; padding:8px; white-space: nowrap; border-radius: 5px;}
+        .poshytip-bubble:after { content: ''; position: absolute; width: 0; height: 0; border: 6px solid; border-color: rgba(136, 183, 213, 0); pointer-events: none;}
+        .poshytip-bubble-top:after { border-bottom-color: Black; left: 50%; bottom: 100%; }
+        .poshytip-bubble-bottom:after { border-top-color: Black; top: 100%; left: 15%; }
+        .poshytip-bubble{transition:top 0.2s;-webkit-transition:top 0.2s;-ms-transition:top 0.2s;-moz-transition:top 0.2s;-o-transition:top 0.2s;}
+        
+        input[type=checkbox]{display:none}
+        input[type=checkbox]+label {
+            text-align:left;cursor:pointer;padding:2px 2px 1px 2px;border-radius:3px;display:inline-block;position:relative;box-shadow:0 0 3px #4D4B4B;overflow:hidden;width:55px;
+            -webkit-transition:all .3s linear,color 0 linear;transition:all .3s linear,color 0 linear; -ms-transition:all .3s linear,color 0 linear;-moz-transition:all .3s linear,color 0 linear; -o-transition:all .3s linear,color 0 linear;
+        }
+        input[type=checkbox]+label:after{content:' ';position:absolute;background:#fff;top:3px;right:5px;width:13px;height:13px;display:block;border-radius:3px;padding:0px;text-align:center;color:black;}
+        input[type=checkbox]:checked+label{color:#fff; font-weight:bold;}
+        input[type=checkbox]+label>span{position:relative;z-index:999999;}
+        input[type=checkbox]:checked+label:after{content:'\2715'; font-size:12px;}
+        input[type=checkbox]+label:before{
+            content:' ';position:absolute;background:#64CBE5;width:0;height:100%;top:0;left:0;
+            -webkit-transition:all .3s ease-in;transition:all .3s ease-in; -ms-transition:all .3s ease-in;-moz-transition:all .3s ease-in;-o-transition:all .3s ease-in;
+        }
+        input[type=checkbox]:checked+label:before{content:' ';position:absolute;width:100%;height:100%;text-shadow:0 1px 0 rgba(0,0,0,.1);top:0;left:0}
+        input[type=checkbox].checkbox2+label:before{width:100%;height:0}
+        input[type=checkbox].checkbox2:checked+label:before{width:100%;height:100%}
+        
+        .hideAnimation{animation:hideAnimation 2.5s;-webkit-animation:hideAnimation 2.5s ease-in;-ms-animation:hideAnimation 2.5s ease-in;-moz-animation:hideAnimation 2.5s ease-in;-o-animation:hideAnimation 2.5s ease-in;}
+        @keyframes hideAnimation {
+            0%{ opacity: 1;filter: alpha(opacity=100);} 20%{ opacity: 0.8;filter: alpha(opacity=80);} 50%{ opacity: 0.5;filter: alpha(opacity=50);} 
+            70%{ opacity: 0.3;filter: alpha(opacity=30);} 100%{ opacity: 0;filter: alpha(opacity=0);}
+        }
+        @-webkit-keyframes hideAnimation {
+            0%{ -webkit-opacity:1;filter: alpha(opacity=100);} 20%{ -webkit-opacity: 0.8;filter: alpha(opacity=80);} 50%{ -webkit-opacity: 0.5;filter: alpha(opacity=50);} 
+            70%{ -webkit-opacity: 0.3;filter: alpha(opacity=30);} 100%{ -webkit-opacity: 0;filter: alpha(opacity=0);}
+        }
+        @-moz-keyframes hideAnimation  {
+            0%{ -moz-opacity:1;opacity: 1;filter: alpha(opacity=100);} 20%{ -moz-opacity:0.8;opacity: 0.8;filter: alpha(opacity=80);} 50%{ -moz-opacity:0.5;opacity: 0.5;filter: alpha(opacity=50);} 
+            70%{ -moz-opacity:0.3;opacity: 0.3;filter: alpha(opacity=30);} 100%{ -moz-opacity:0;opacity: 0;filter: alpha(opacity=0);}
+        }
+        @-ms-keyframes hideAnimation {
+            0%{ -ms-opacity:1;-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";} 20%{ -ms-opacity: 0.8;-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";}
+            50%{ -ms-opacity: 0.5;-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";} 70%{ -ms-opacity: 0.3;-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";} 100%{ -ms-opacity: 0;-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";}
+        }
+        @-o-keyframes hideAnimation {
+            0%{ -o-opacity:1;filter: alpha(opacity=100);} 20%{ -o-opacity: 0.8;filter: alpha(opacity=80);} 50%{ -o-opacity: 0.5;filter: alpha(opacity=50);} 
+            70%{ -o-opacity: 0.3;filter: alpha(opacity=30);} 100%{ -o-opacity: 0;filter: alpha(opacity=0);} }
+        
+        input[type=range] {
+            appearance: none;-webkit-appearance: none;-moz-appearance:none;-ms-appearance:none;-o-appearance:none;width: 150px; height:6px; border-radius: 3px;cursor:pointer;
+            background:linear-gradient(to right, #3E8EDB 50%,#323232 0%);background:-webkit-linear-gradient(to right,#3E8EDB 50%,#323232 0%);
+            background:-ms-linear-gradient(to right,#3E8EDB 50%,#323232 0%); background:-o-linear-gradient(to right,#3E8EDB 50%,#323232 0%); color:#323232;            
+        }
+        input[type=range]::-ms-fill-lower {height: 6px; border-radius: 3px;background: linear-gradient(to right, #3E8EDB,#3E8EDB 100%,#323232,#323232);}input[type=range]::-ms-fill-upper { height: 6px; border-radius: 3px;background: #323232;}
+        input[type=range]:focus::-ms-fill-lower { background: linear-gradient(to right, #3E8EDB,#3E8EDB 100%,#323232,#323232); }input[type=range]:focus::-ms-fill-upper { background: #323232;}        
+        input[type=range]::-moz-range-progress {background:-moz-linear-gradient(to right, #3E8EDB,#3E8EDB 100%,#323232,#323232);}
+        input[type=range]::slider-runnable-track { height: 6px; border-radius: 3px;} 
+        input[type=range]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px;} input[type=range]::-o-slider-runnable-track { height: 6px; border-radius: 3px;}
+        input[type=range]::-moz-range-track { height: 6px; border-radius: 3px;} input.nothumb[type=range]::-moz-range-track { height: 10px; border-radius: 0px;} input#progressbar[type=range]::-moz-range-track {border-radius: 0px;}
+        input[type=range]::-ms-track { height: 6px; border-radius: 3px;border-color: transparent;color: transparent;}         
+        input[type=range]:focus { outline: none;}
+        input[type=range]::slider-thumb { appearance:none; width:15px;height:6px; background: #ffffff;border-radius:3px;} 
+        input.rg_radius[type=range]::slider-thumb{width: 10px;height:10px;border-radius:5px; margin-top:-2px;} input.nothumb[type=range]::slider-thumb{width:0px;height:0px;border-radius:0px;}
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px;height:6px; background: #ffffff;border-radius:3px;} 
+        input.rg_radius[type=range]::-webkit-slider-thumb{width: 10px;height:10px;border-radius:5px; margin-top:-2px;}input.nothumb[type=range]::-webkit-slider-thumb{width:0px;height:0px;border-radius:0px;}
+        input[type=range]::-moz-range-thumb { -moz-appearance:none; width:15px;height:6px; background: #ffffff;border-radius:3px;} 
+        input.rg_radius[type=range]::-moz-range-thumb{width: 10px;height:10px;border-radius:5px; margin-top:-2px;}input.nothumb[type=range]::-moz-range-thumb{width:0px;height:0px;border-radius:0px;}
+        input[type=range]::-ms-thumb { -ms-appearance:none; width:15px;height:6px; background: #ffffff;border-radius:3px;} 
+        input.rg_radius[type=range]::-ms-thumb{width: 10px;height:10px;border-radius:5px; margin-top:-2px;}input.nothumb[type=range]::-ms-thumb{width:0px;height:0px;border-radius:0px;}
+        input[type=range]::-o-slider-thumb { -o-appearance:none; width:15px;height:6px; background: #ffffff;border-radius:3px;} 
+        input.rg_radius[type=range]::-o-slider-thumb{width: 10px;height:10px;border-radius:5px; margin-top:-2px;}input.nothumb[type=range]::-o-slider-thumb{width:0px;height:0px;border-radius:0px;}
+    </style>
+</head>
+<body>
+    <div style="width: 100%; height: 100%;" class="page-content">
+        <div id="MyDivBox">
+            <!--播放器界面-->
+            <div id="videoBox" source="video">
+                <!--文件名-->
+                <p id="videoFileName">墨☆尘的播放器</p>
+                <!--视频-->
+                <div id="ck_video"></div>
+                <video id="MyVideo" src="" width="800" height="500" autoplay preload="auto" poster="images/Poster.jpg" contextmenu="mymenu" data-setup="{}">
+                    <track kind="subtitles" src="字幕-中文.vtt" srclang="zh" label="Chinese" default="default">
+                    <track kind="subtitles" src="字幕-日语.vtt" srclang="ja" label="Japanese">
+                    <track kind="subtitles" src="字幕-英文.srt" srclang="en" label="English">                
+                </video>
+                <!--控制工具栏-->
+                <div style="margin-bottom:5px;z-index:20;margin-top:-5px;position:absolute;width:100%;">
+                    <input type="range" id="progressbar" value="0" min="0" max="100" step="0.1" class="Isposhytip" poshytip="data-title" data-title="0:00" style="width:100%;height:3px;float:left;border-radius:0px;"/>
+                </div>
+                <p id="toolbar">
+                    <span style="float:left;margin-left:15px;">
+                        <img src="images/Set.ico" alt="设置" id="Setting" width="30" height="30" onclick="showSet();" class="radius15"/>
+                        <img src="images/list.ico" alt="播放列表" width="20" height="25" onclick="showFiles();" style="margin-bottom:2.5px;"/>
+                        <span id="fullspan" style="width:85px;height:20px;display:block;float:right;"></span>
+                    </span>
+                    <span style="text-align:center;">
+                        <img src="images/switchs.ico" alt="打开文件" id="switch" onclick="fn.click();" width="30" height="30"/>
+                        <input type="file" id="fn" name="fn" loadtype="file" class="hide" />
+                        <img src="images/prev.ico" onclick="Prevfile();" alt="上一篇" width="30" height="30" class="radius15"/>
+                        <img src="images/Stepback.ico" alt="回放" width="30" height="30" onclick="StepBack();" class="radius15 hide" id="Stepback"/>
+                        <img src="images/play.ico" alt="播放" width="30" height="30" onclick="playOrpause();" id="img_playOrpause"/>
+                        <img src="images/Stepback.ico" alt="快播" width="30" height="30" onclick="Speed(3);" class="radius15  transform180 hide" id="Stepforward"/>
+                        <img src="images/prev.ico" onclick="Nextfile();" alt="下一篇" width="30" height="30" class="radius15 transform180"/>
+                        <img src="images/Stop.ico" alt="停止" width="30" height="30" onclick="Stop();"/>
+                        <img src="images/Repeat.ico" alt="重播" width="30" height="30" onclick="BackRate();" class="radius15 hide" id="Record"/>
+                    </span>                    
+                    <span style="float:right;margin-right:15px;">
+                        <img src="images/Volume.ico" alt="音量" width="25" height="25" onclick="Mute();" class="radius15" id="img_volume" style="margin-top:2.5px;float:left;"/>
+                        <input type="range" id="volumebar" value="100" min="0" max="100" class="rg_radius poshytip" poshytip="data-title" data-title="100%" style="width:70px;margin:13px 10px 0px 5px;float:left;"/>
+                        <img src="images/fullScreen.ico" alt="全屏" width="22" height="22" onclick="FullScreen();" style="margin-top:6px;"/>
+                        <a id="downloadlink" href="index.html" download class="hide">下载链接</a>
+                    </span>
+                </p>
+            </div>
+            <!--自定义右键多级菜单-->
+            <div id="rightMenu" style="display: none;">
+                <ul>
+                    <li onclick="playOrpause();"><strong id="MyP" class="label" lang="pause">暂停</strong><lable>[blank]</lable></li>
+                    <li onclick="Stop();"><strong class="label" lang="stop">停止</strong><lable>[End]</lable></li>
+                    <li onclick="BackRate();"><strong class="label" lang="backRate">重播</strong><lable>[Home]</lable></li>
+                    <li><span onclick="showControls()"><strong class="label" lang="progress">进度条</strong><lable>shift+C</lable></span>
+                        <ul>
+                            <li onclick="FF(5);"><span class="label kktime" lang="ff5">快进5秒</span><lable></lable></li>
+                            <li onclick="Rew(5);"><span class="label kktime" lang="rew5">快退5秒</span><lable></lable></li>
+                            <li onclick="FF(10);"><span class="label kktime subtimeed" lang="ff10">快进10秒</span><lable>→</lable></li>
+                            <li onclick="Rew(10);"><span class="label kktime subtimeed" lang="rew10">快退10秒</span><lable>←</lable></li>
+                            <li onclick="FF(15);"><span class="label kktime" lang="ff15">快进15秒</span><lable></lable></li>
+                            <li onclick="Rew(15);"><span class="label kktime" lang="rew15">快退15秒</span><lable></lable></li>
+                            <li style="height:1px;"><hr/></li>
+                            <li onclick="Speed(3);"><span class="label" lang="speed">加速3倍</span><lable>ctrl+→</lable></li>
+                            <li onclick="Slower(3);"><span class="label" lang="slower">减速3倍</span><lable>ctrl+↓</lable></li>
+                            <li onclick="Normal();"><span class="label" lang="normal">正常倍速</span><lable>ctrl+↑</lable></li>
+                            <li onclick="StepBack();"><span class="label" lang="stepBack">回放</span><lable>ctrl+←</lable></li>
+                            <li style="height:1px;"><hr/></li>
+                            <li onclick="Prevfile();"><span class="label" lang="prev">上一篇</span><lable>PageUp</lable></li>
+                            <li onclick="Nextfile();"><span class="label" lang="next">下一篇</span><lable>PageDown</lable></li>
+                        </ul>
+                    </li>
+                    <li rightmenu="true"><strong class="label" rightmenu="true" lang="volume">音量</strong>
+                        <ul>
+                            <li onclick="Mute(this);"><span id="MyMute" class="label" lang="mute">静音</span><lable>alt+M</lable></li>
+                            <li onclick="SetRisevolume();"><span class="label" lang="riseVolume">加大音量</span><lable>↑</lable></li>
+                            <li onclick="SetDropvolume();"><span class="label" lang="dropVolume">减小音量</span><lable>↓</lable></li>
+                        </ul>
+                    </li>
+                    <li rightmenu="true"><strong class="label" rightmenu="true" lang="load">载入|下载</strong>
+                        <ul>
+                            <li onclick="loadData('subtitle');"><span class="label" lang="subtitle">载入字幕/歌词</span><lable>alt+V</lable></li>
+                            <li onclick="loadData('poster');"><span class="label" lang="poster">载入海报/写真</span><lable>alt+P</lable></li>
+                            <li onclick="loadData('flash');"><span class="label" lang="flash">载入插件</span><lable>ctrl+alt+F</lable></li>
+                            <li style="height:1px;"><hr/></li>
+                            <li onclick="Download('subtitle');"><span class="label" lang="downSubtitle">下载【字幕/歌词】</span></li>
+                            <li onclick="Download('poster');"><span class="label" lang="downPoster">下载【海报/写真】</span></li>
+                            <li onclick="Download('file');"><span class="label" lang="downFile">下载【视频/歌曲】</span></li>
+                            <li onclick="Download('page');"><span class="label" lang="downPage">下载【播放器】</span></li>
+                        </ul>
+                    </li>
+                    <li rightmenu="true"><strong class="label" rightmenu="true" lang="language">语言</strong>
+                        <ul>
+                            <span id="pagelang" title="页面语言(shift+P)" class="mytitle" lang="pagelang">
+                                <li onclick="switchPageLang('zh-CH');" type="zh-CH" class="subtitled"><span>简体中文</span></li>
+                                <li onclick="switchPageLang('jp-JA');" type="jp-JA"><span>にほんご</span></li>
+                                <li onclick="switchPageLang('en-EN');" type="en-EN"><span>English</span></li>
+                            </span>
+                            <li style="height:1px;"><hr/></li>
+                            <span id="subtitlelang" title="字幕语言(shift+Y)" class="mytitle" lang="subtitlelang">
+                                <li onclick="switchLang('zh');" type="zh" class="subtitled label" lang="zhSub"><span>中文字幕</span></li>
+                                <li onclick="switchLang('ja');" type="ja" class="label" lang="jpSub"><span>日文字幕</span></li>
+                                <li onclick="switchLang('en');" type="en" class="label" lang="enSub"><span>英文字幕</span></li>
+                            </span>
+                        </ul>
+                     </li>
+                    <li onclick="FullScreen();"><strong id="MyFullScreen" class="label" lang="fullScreen">全屏</strong><lable>[Enter]</lable></li>
+                    <li onclick="showSet();"><strong class="label" lang="setCenter">设置中心</strong><lable>shift+S</lable></li>
+                    <li onclick="switchFlash();"><strong class="label" lang="engine">播放引擎</strong><lable>shift+F</lable></li>
+                    <li rightmenu="true"><strong class="label" rightmenu="true" lang="localstorage">本地存储</strong>
+                        <ul>
+                            <li onclick="localStoragefiles('urlfile');"><span class="label" lang="urlfile">网络文件</span></li>
+                            <li onclick="localStoragefiles('localfile');"><span class="label" lang="localfile">本地文件</span></li>
+                            <li onclick="localStoragefiles('player');"><span class="label" lang="player">播放器设置</span></li>
+                            <li onclick="localStoragefiles('clear');"><span class="label" lang="clearstorage">清除本地缓存</span></li>
+                        </ul>
+                    </li>
+                    <li rightmenu="true"><strong class="label" rightmenu="true" lang="openfile">打开文件</strong>
+                        <ul>
+                            <li onclick="fn.click();"><span class="label" lang="openfile">打开文件</span><lable>ctrl+O</lable></li>
+                            <li onclick="filelist.click();"><span class="label" lang="openfiles">打开文件夹</span><lable>shift+O</lable></li>
+                            <li onclick="OpenUrl(true);"><span class="label" lang="openurl">打开URL</span><lable>shift+U</lable></li>
+                            <li style="height:1px;"><hr/></li>
+                            <li onclick="addfile();"><span class="label" lang="addfile">添加文件</span><lable>alt+O</lable></li>
+                            <li onclick="addlist();"><span class="label" lang="addfiles">添加文件夹</span><lable>alt+L</lable></li>
+                            <li onclick="OpenUrl(false);"><span class="label" lang="addurl">添加URL</span><lable>alt+U</lable></li>
+                        </ul>
+                    </li>
+                    <li><span onclick="showFiles();"><strong class="label" lang="playlist">播放列表</strong><lable>shift+L</lable></span>
+                        <ul>
+                            <span id="PlayingType" title="播放模式(alt+S)" class="mytitle" lang="playtype">
+                                <li type="one" class="label" lang="ptOne"><span>单次播放</span></li>
+                                <li type="again" class="label" lang="ptAgain"><span>重复播放</span></li>
+                                <li type="order" class="ptype label" lang="ptOrder"><span>顺序播放</span></li>
+                                <li type="select" class="label" lang="ptSelect"><span>选中播放</span></li>
+                                <li type="random" class="label" lang="ptRandom"><span>随机播放</span></li>
+                                <li type="loops" class="label" lang="ptLoops"><span>循环播放</span></li>
+                            </span>
+                            <li style="height:1px;"><hr/></li>
+                            <li onclick="clearFiles(false);"><span class="label" lang="clearfile">清除文件</span><lable>Delete</lable></li>
+                            <li onclick="clearFiles(true);"><span class="label" lang="clearlist">清空列表</span><lable>alt+Del</lable></li>
+                            <li style="height:1px;"><hr/></li>
+                            <li onclick="Movefiles(true);"><span class="label" lang="movefileup">文件上移</span><lable>alt+↑</lable></li>
+                            <li onclick="Movefiles(false);"><span class="label" lang="movefiledown">文件下移</span><lable>alt+↓</lable></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!--右键多级菜单-->
+            <menu type="context" id="mymenu">
+                <menuitem label="停止(End)" onclick="Stop();" class="menu" lang="menu_stop"></menuitem>
+                <menuitem label="重播(Home)" onclick="BackRate();" class="menu" lang="menu_backRate"></menuitem>
+                <menu label="进度条" class="menu" lang="progress">
+                    <menuitem label="快进5秒" onclick="FF(5);" class="menu kktime" lang="menu_ff5"></menuitem>
+                    <menuitem label="快退5秒" onclick="Rew(5);" class="menu kktime" lang="menu_rew5"></menuitem>
+                    <menuitem label="快进10秒(→)" onclick="FF(10);" class="menu kktime" lang="menu_ff10"></menuitem>
+                    <menuitem label="快退10秒(←)" onclick="Rew(10);" class="menu kktime" lang="menu_rew10"></menuitem>
+                    <menuitem label="快进15秒" onclick="FF(15);" class="menu kktime" lang="menu_ff15"></menuitem>
+                    <menuitem label="快退15秒" onclick="Rew(15);" class="menu kktime" lang="menu_rew15"></menuitem>
+                    <menuitem label="加速3倍(ctrl+→)" onclick="Speed(3);" class="menu" lang="menu_speed"></menuitem>
+                    <menuitem label="减速3倍(ctrl+↓)" onclick="Slower(3);" class="menu" lang="menu_slower"></menuitem>
+                    <menuitem label="正常倍速(ctrl+↑)" onclick="Normal();" class="menu" lang="menu_normal"></menuitem>
+                    <menuitem label="回放(ctrl+←)" onclick="StepBack();" class="menu" lang="menu_stepBack"></menuitem>
+                    <menuitem label="上一篇(PageUp)" onclick="Prevfile();" class="menu" lang="menu_prev"></menuitem>
+                    <menuitem label="下一篇(PageDown)" onclick="Nextfile();" class="menu" lang="menu_next"></menuitem>
+                </menu>
+                <menu label="音量" class="menu" lang="volume">
+                    <menuitem label="静音(alt+M)" onclick="Mute();" id="mMute" class="menu" lang="menu_mute"></menuitem>
+                    <menuitem label="加大音量(↑)" onclick="SetRisevolume();" class="menu" lang="menu_riseVolume"></menuitem>
+                    <menuitem label="减小音量(↓)" onclick="SetDropvolume();" class="menu" lang="menu_dropVolume"></menuitem>
+                </menu>                
+                <menu label="载入|下载" class="menu" lang="load">
+                    <menuitem label="载入字幕/歌词" onclick="loadData('subtitle');"class="menu" lang="subtitle"></menuitem>
+                    <menuitem label="载入海报/写真" onclick="loadData('poster');"class="menu" lang="poster"></menuitem>
+                    <menuitem label="载入插件" onclick="loadData('flash');"class="menu" lang="flash"></menuitem>
+                    <menuitem label="下载【字幕/歌词】" onclick="Download('subtitle');"class="menu" lang="downSubtitle"></menuitem>
+                    <menuitem label="下载【海报/写真】" onclick="Download('poster');"class="menu" lang="downPoster"></menuitem>
+                    <menuitem label="下载【视频/歌曲】" onclick="Download('file');"class="menu" lang="downFile"></menuitem>
+                    <menuitem label="下载【播放器】" onclick="Download('page');"class="menu" lang="downPage"></menuitem>
+                </menu>
+                <menu label="语言" class="menu" lang="language">
+                    <menu label="页面语言(shift+P)" id="pagelangs" class="menu" lang="pagelang">
+                        <menuitem label="简体中文√" type="zh-CH" onclick="switchPageLang('zh-CH');"></menuitem>
+                        <menuitem label="にほんご" type="jp-JA" onclick="switchPageLang('jp-JA');"></menuitem>
+                        <menuitem label="English" type="en-EN" onclick="switchPageLang('en-EN');"></menuitem>
+                    </menu>
+                    <menu label="字幕语言(shift+Y)" id="subtitlelangs" class="menu" lang="subtitlelang">
+                        <menuitem label="中文字幕√" type="zh" onclick="switchLang('zh');"class="menu" lang="zhSub"></menuitem>
+                        <menuitem label="日文字幕" type="ja" onclick="switchLang('ja');"class="menu" lang="jpSub"></menuitem>
+                        <menuitem label="英文字幕" type="en" onclick="switchLang('en');"class="menu" lang="enSub"></menuitem>
+                    </menu>
+                </menu>
+                <menuitem label="切换全屏(Enter)" onclick="FullScreen();"class="menu" lang="menu_fullScreen"></menuitem>
+                <menuitem label="播放引擎(shift+F)" onclick="switchFlash();"class="menu" lang="menu_engine"></menuitem>
+                <menuitem label="设置中心(shift+S)" onclick="showSet();"class="menu" lang="menu_setCenter"></menuitem>
+                <menu label="本地存储" class="menu" lang="localstorage">
+                    <menuitem label="网络文件" onclick="localStoragefiles('urlfile');" class="menu" lang="urlfile"></menuitem>
+                    <menuitem label="本地文件" onclick="localStoragefiles('localfile');" class="menu" lang="localfile"></menuitem>
+                    <menuitem label="播放器设置" onclick="localStoragefiles('player');" class="menu" lang="player"></menuitem>
+                    <menuitem label="清除本地缓存" onclick="localStoragefiles('clear');" class="menu" lang="clearstorage"></menuitem>
+                </menu>
+                <menu label="打开文件" class="menu" lang="openfile">
+                    <menuitem label="打开文件" onclick="fn.click();" class="menu" lang="openfile"></menuitem>
+                    <menuitem label="打开文件夹" onclick="filelist.click();" class="menu" lang="openfiles"></menuitem>
+                    <menuitem label="打开URL(shift+U)" onclick="OpenUrl(true);" class="menu" lang="menu_openurl"></menuitem>
+                    <menuitem label="添加文件" onclick="addfile();" class="menu" lang="addfile"></menuitem>
+                    <menuitem label="添加文件夹" onclick="addlist();" class="menu" lang="addfiles"></menuitem>
+                    <menuitem label="添加URL(alt+U)" onclick="OpenUrl(false);" class="menu" lang="menu_addurl"></menuitem>
+                </menu>
+                <menu label="播放列表" class="menu" lang="playlist">
+                    <menuitem label="播放列表(shift+L)" onclick="showFiles();" class="menu" lang="menu_playlist"></menuitem>
+                    <menu label="播放模式(alt+S)" class="menu" lang="playtype">
+                        <menuitem label="单次播放" class="ptypes menu" type="one" lang="ptOne"></menuitem>
+                        <menuitem label="重复播放" class="ptypes menu" type="again" lang="ptAgain"></menuitem>
+                        <menuitem label="顺序播放√" class="ptypes menu" type="order" lang="ptOrder"></menuitem>
+                        <menuitem label="选中播放" class="ptypes menu" type="select" lang="ptSelect"></menuitem>
+                        <menuitem label="随机播放" class="ptypes menu" type="random" lang="ptRandom"></menuitem>
+                        <menuitem label="循环播放" class="ptypes menu" type="loops" lang="ptLoops"></menuitem>
+                    </menu>
+                    <menuitem label="清除文件(Delete)" onclick="clearFiles(false);" class="menu" lang="menu_clearfile"></menuitem>
+                    <menuitem label="清空列表(alt+Del)" onclick="clearFiles(true);" class="menu" lang="menu_clearlist"></menuitem>
+                    <menuitem label="文件上移(alt+↑)" onclick="Movefiles(true);" class="menu" lang="menu_movefileup"></menuitem>
+                    <menuitem label="文件下移(alt+↓)" onclick="Movefiles(false);" class="menu" lang="menu_movefiledown"></menuitem>
+                </menu>
+            </menu>
+            <!--设置中心-->
+            <div style="display: none;z-index:350;" id="Settings">
+                <div id="SetBox">
+                    <p class="title" id="Mdown">
+                        <span class="t1 label" lang="set">设置</span>
+                        <span class="t2 mytitle" poshytip="no" lang="close" title="关闭" onclick="$('#Settings').css('display','none');">✖</span>
+                        <span class="t3 mytitle" lang="copyright" title="©おうき 版权所有">i</span>
+                    </p>
+                    <div style="padding:0 10px 0 5px;">
+                        <form id="myform">
+                        <table width="100%" height="200px">
+                            <tr><td class="label" lang="screenRatio" style="padding-right:13px;">屏幕比例:</td>
+                                <td id="rd_screen">
+                                    <input type="radio" value="3:4" id="screen_1" class="hide" name="screen" onclick="Setscreen(this.value)"/>
+                                    <label for="screen_1" style="padding:3px 10px;">3:4</label>
+                                    <input type="radio" value="5:8" id="screen_2" class="hide" name="screen" checked="checked" onclick="Setscreen(this.value)"/>
+                                    <label for="screen_2" style="padding:3px 10px;" class="bglabel">5:8</label>
+                                    <input type="radio" value="8:16" id="screen_3" class="hide" name="screen" onclick="Setscreen(this.value)"/>
+                                    <label for="screen_3" style="padding:3px 10px;">8:16</label>
+                                </td>
+                            </tr>
+                            <tr><td class="label" lang="screenWidth" style="padding-right:13px;">调屏宽条:</td>
+                                <td><input type="range" id="rangeBox" class="rangebox Isposhytip" poshytip="data-title" value="50" min="10" max="100" data-title="50%"/>
+                                    <label id="rangeResult">50%</label></td>
+                            </tr>
+                            <tr><td class="label" lang="screenHeight" style="padding-right:13px;">调屏高条:</td>
+                                <td><input type="range" id="rangeBox2" class="rangebox Isposhytip" poshytip="data-title" value="50" min="10" max="100" data-title="50%"/>
+                                    <label id="rangeResult2">50%</label></td>
+                            </tr>
+                            <tr id="colors"><td class="label" lang="colorBoard" style="padding-right:13px;">调 色 板:</td>
+                                <td><input type="color" name="color" bgtype="body_bg" value="#323232" class="mytitle" title="页面背景" lang="pagebg"/>
+                                    <input type="color" name="color" bgtype="video_bg" value="#868383" title="播放器背景" class="mytitle" lang="playerbg"/>
+                                    <input type="color" name="color" bgtype="all_bg" value="#323232" title="界面背景" class="mytitle" lang="interfacebg"/></td>
+                            </tr>
+                            <tr><td class="label" lang="showOrhide" style="padding-right:13px;">显/隐  键:</td>
+                                <td>
+                                    <input type="checkbox" id="ck_Stepforward" value="Stepforward" onclick="ck_Show(this);"/>
+                                    <label for="ck_Stepforward"><span class="label" lang="ck_speed">加速</span></label>
+                                    <input type="checkbox" id="ck_Stepback" value="Stepback" onclick="ck_Show(this);"/>
+                                    <label for="ck_Stepback"><span class="label" lang="stepBack">回放</span></label>
+                                    <input type="checkbox" id="ck_Record" value="Record" onclick="ck_Show(this);"/>
+                                    <label for="ck_Record"><span class="label" lang="backRate">重播</span></label>
+                                </td>
+                            </tr>
+                            <tr><td style="padding-right:13px;"></td>
+                                <td>
+                                    <input type="checkbox" id="ck_Filename" class="checkbox2" value="videoFileName" checked="checked" onchange="ck_Hide(this);"/>
+                                    <label for="ck_Filename"><span class="label" lang="ck_filename">片名</span></label>
+                                    <input type="checkbox" id="ck_toolbar" class="checkbox2" value="toolbar" checked="checked" onchange="ck_Hide(this);"/>
+                                    <label for="ck_toolbar"><span class="label" lang="ck_toolbar">工具</span></label>
+                                    <input type="checkbox" id="ck_Lock" class="checkbox2" onclick="Lock(this);"/>
+                                    <label for="ck_Lock"><span class="label" lang="ck_lock">锁定</span></label>
+                                </td>
+                            </tr>
+                        </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--浏览列表-->
+            <div class="hide" id="filesbox">
+               <p style="font-size:15px;cursor:move;">
+                   <img src="images/list.ico" alt="播放列表" width="15" height="20" style="margin-top:5px;"/>
+                   <label class="label" lang="playlist">播放列表</label>
+                   <img src="images/list.ico" id="rightlist" alt="播放列表" width="15" height="20" style="margin-top:5px;"/>
+               </p>
+               <p><input type="text" oninput="Search(this.value)" class="Search placeholder" lang="search" autocomplete="off" spellcheck placeholder=" 搜 索 "/></p>
+               <div id="filelistbox" onselectstart="return false;" class="unselectable"></div>
+               <p style="overflow:hidden;text-align:center;padding-bottom:2px;" id="toolbarbylist">
+                   <input type="file" id="filelist" multiple="multiple" directory webkitdirectory mozdirectory class="hide"/>
+                   <span id="btnadd" style="font-family:Arial;font-size:22px;" title="添加" onclick="addlist();" class="mytitle" lang="add">✚</span>
+                   <span style="font-family:Batang;" title="清除" onclick="clearFiles(false);" class="mytitle" lang="clear">✖</span>
+                   <span style="font-family:Calibri;font-weight:bolder;" title="上移" onclick="Movefiles(true);" class="mytitle" lang="up">↑</span>
+                   <span style="font-family:Calibri;font-weight:bolder;" title="下移" onclick="Movefiles(false);" class="mytitle" lang="down">↓</span>
+                   <span onclick="SwitchType();" style="padding-top:4px;">
+                       <img id="playmodel" src="images/play_order.ico" width="24" height="16" class="mytitle" lang="ptOrder" poshytip="data-title" data-title="顺序播放"/>
+                   </span>
+                   <label style="float:right; font-size:12px;"><spant id="VTime">00:00/00:00</spant></label>
+               </p>
+               <ul id="Openlist" style="display:none;">
+                   <li onclick="fn.click();" class="label" lang="openfile">打开文件</li>
+                   <li onclick="filelist.click();" class="label" lang="openfiles">打开文件夹</li>
+                   <li onclick="OpenUrl(true);" class="label" lang="openurl">打开URL</li>
+                   <li style="height:1px;width:60px;"><hr/></li>
+                   <li onclick="addfile();" class="label" lang="addfile">添加文件</li>
+                   <li onclick="addlist();" class="label" lang="addfiles">添加文件夹</li>
+                   <li onclick="OpenUrl(false);" class="label" lang="addurl">添加URL</li>
+               </ul>
+            </div>
+            <!--系统消息框-->
+            <div id="messageBox">
+                <p style="background-color: #73A2d6;color: #fff;height:30px;padding:0 8px 0 15px;cursor:move;line-height:30px;">
+                    <label style="float:left;" class="label" lang="sysMessage">温馨提示</label>
+                    <span class="sysClose mytitle" poshytip="no" style="margin-top:6px;" lang="close" title="关闭" onclick="$('#messageBox').css('display','none');">✖</span>
+                </p>
+                <div style="width:300px;height:60px;padding-top:15px;text-align:center;">
+                    <label id="messages"></label>
+                </div>
+                <p style="background-color:#FFFFFF;height:35px;text-align:center;">
+                    <button class="label bglabel" lang="sure" style="width:80px;height:35px;color:#FFFFFF;border-radius:6px;" onclick="$('#messageBox').css('display','none');">知道了</button>
+                </p>
+            </div>
+            <!--title提示框-->
+            <div style="float:left;" class="hide">
+                <div id="poshytip-bubble" class="poshytip-bubble poshytip-bubble-bottom">
+                    箭头在底部
+                </div>
+            </div>
+            <!--播放器提示框-->
+            <div id="playertip" class="hide"></div>
+        </div>
+    </div>
+    <!--js脚本代码-->
+    <script src="ckplayer/ckplayer.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        var video = document.getElementById("MyVideo"); var CkFlash;   //播放界面
+        var IsVideoEngine = true;  //是否Video引擎；
+        var fileName = document.getElementById("fn");//选择文件按钮
+        var backtime; /*用于回放的定时器*/               var clicktime; //单击延长器；
+        var blurtime; /*失焦的定时器*/       var swf_time;	var showtime; //显示定时器；
+        var kktime = 10; //默认快进时间；
+        var locked = false; //锁定界面；
+        var HtmlHeight = document.body.scrollHeight;//界面尺
+        var myfiles = []; //播放文件列表
+        var currentfile = -1; /*当前文件序*/             var oldcurfile = -1;//旧序号
+        var file; /*文件对象*/   var path; /*文件路径*/  var url; //文件信息
+        var opened = true;//是否打开
+        var oldlength = myfiles.length;//历史数量
+        var files_li = document.getElementById("filelistbox").getElementsByTagName("li"); //文件列表
+        var playtypeed = "order";   /*播放模式*/
+        var pagelangtype = "zh-CH"; //页面语言
+
+        //简易筛选器；
+        function $(selecter) {
+            var resultObj;
+            //筛选
+            if (typeof(selecter) == "string") {
+                var eles = selecter.split(' ');
+                if (eles[0] == "this") {
+                    var e = e || event || window.event || arguments[0];
+                    resultObj = e.target;
+                    if (eles.length > 1) {
+                        selecter = selecter.substr(selecter.indexOf(' ') + 1, selecter.length - selecter.indexOf(' ') - 1);
+                        resultObj = resultObj.querySelectorAll(selecter); }
+                }
+                else {
+                    resultObj = document.querySelectorAll(selecter);
+                    if (resultObj.length == 1 && eles.length == 1 && eles[0].charAt(0) == "#") { resultObj = resultObj[0]; }                        
+                }
+            }
+            else {
+                resultObj = selecter;
+            }
+
+            //自定义事件；
+            resultObj.css = function (styleName, newVal) {
+                if (typeof (resultObj.length) == "undefined" && resultObj) { var element = resultObj; resultObj = []; resultObj.push(element); }
+                if ((newVal || newVal == "") && resultObj.length) { for (var i = 0; i < resultObj.length; i++) { resultObj[i].style[styleName] = newVal; } }
+                else if (resultObj.length == 1) {
+                    if (resultObj[0].currentStyle) { return resultObj[0].currentStyle[styleName]; }
+                    else {
+                        try { try { return window.getComputedStyle(resultObj[0], null)[styleName]; } catch (e) { try { return document.defaultView.getComputedStyle(resultObj[0], null)[styleName]; } 
+                        catch (e) { return resultObj[0].ownerDocument.defaultView.getComputedStyle(resultObj[0], null)[styleName]; } } } 
+                        catch (e) { return resultObj[0].ownerDocument.defaultView.getComputedStyle(resultObj[0], null)[styleName]; } }
+                }
+            }
+            resultObj.attr = function (property, newVal) {
+                if (typeof (resultObj.length) == "undefined" && resultObj) { var element = resultObj; resultObj = []; resultObj.push(element); }
+                if ((newVal || newVal=="") && resultObj.length) { for (var i = 0; i < resultObj.length; i++) { resultObj[i].setAttribute(property, newVal); } }
+                else if (resultObj.length == 1) { return resultObj[0].getAttribute(property); }
+            }
+            resultObj.html = function (content) {
+                if (typeof (resultObj.length) == "undefined" && resultObj) { var element = resultObj; resultObj = []; resultObj.push(element); }
+                if ((content || content=="") && resultObj.length) { for (var i = 0; i < resultObj.length; i++) { resultObj[i].innerHTML = content; } }
+                else if (resultObj.length == 1) { return resultObj[0].innerHTML; }
+            }
+            resultObj.find = function (filtrate) {
+                return $(resultObj.querySelectorAll(filtrate)); 
+            }
+            resultObj.addEvent = function (type, handle) {
+                if (typeof (resultObj.length) == "undefined" && resultObj) { var element = resultObj; resultObj = []; resultObj.push(element); }
+                if (resultObj.length) for (var i = 0; i < resultObj.length; i++) {
+                    try { resultObj[i].addEventListener(type, handle, false); } catch (e) { try { resultObj[i].attachEvent('on' + type, handle); } catch (e) { resultObj[i]['on' + type] = handle; } }
+                }
+            }
+
+            return resultObj;
+        }
+
+        //数组 自定义方法；(公用)
+        Array.prototype.InArray = function (checkVal) {
+            for (var i = 0; i < this.length; i++) {
+                if (this[i] === checkVal) return true;
+            } return false;
+        }
+
+        //界面水平垂直居中；判断火狐
+        if (parseFloat(HtmlHeight) == 0) HtmlHeight = document.documentElement.scrollHeight;
+        if (window.navigator.userAgent.indexOf("Firefox") > -1) {
+            HtmlHeight = document.documentElement.scrollHeight;
+            $("#filelist").removeAttribute("webkitdirectory"); showControls();
+        }        
+        //界面背景；        
+        $("#colors input").addEvent("change", function () {
+            switchColor(this.getAttribute("bgtype"),this.value);
+            this.setAttribute("value", this.value);
+        });
+        function switchColor(bgtype,value) {
+            switch (bgtype) {
+                case "body_bg":  document.body.style.background = value; MyDivBox.parentNode.style.background = value;
+                                 $("#colors input")[0].setAttribute("value", value); break;
+                case "video_bg": $("p").css("background-color", value); $("#colors input")[1].setAttribute("value", value); break;
+                default:         document.body.style.background = value; MyDivBox.parentNode.style.background = value;
+                                 $("p").css("background-color", value); $("#colors input").attr("value", value); break;
+            }
+        }
+
+        //设置窗口|列表配置；
+        var IsMousedown, set_left, set_top, Set; var box_focused = false;
+        SetWindow($("#SetBox")); SetWindow($("#filesbox")); SetWindow($("#messageBox"));
+        function showSet() {
+            $("#Settings").removeAttribute("class");
+            if ($("#Settings").css("display") == "none") {
+                $("#Settings").css("display", "block");
+                $("#Settings").style.top = document.documentElement.clientHeight / 2 - ($("#SetBox").offsetHeight / 2) + "px";
+                $("#Settings").style.left = document.body.clientWidth / 2 - ($("#SetBox").offsetWidth / 2) + "px";
+                showtime = setTimeout("$('#Settings').className='transform360';clearTimeout(showtime);", 300);
+            }
+            else { $("#Settings").css("display", "none"); }
+        }
+        function showMessage(mess) {
+            $("#messages").innerHTML = mess;
+            if ($("#messageBox").css("display") == "none") {
+                $("#messageBox").css("display", "block");
+                $("#messageBox").style.top = document.documentElement.clientHeight / 2 - ($("#messageBox").offsetHeight / 2) + "px";
+                $("#messageBox").style.left = document.body.clientWidth / 2 - ($("#messageBox").offsetWidth / 2) + "px";
+            }
+        }
+        function showTip(tip) {
+            var playertip = document.getElementById("playertip");
+            playertip.innerHTML = tip;
+            if (playertip.getAttribute("class") == "hideAnimation")
+                document.getElementById("MyDivBox").replaceChild(playertip.cloneNode(true), playertip);
+            else { playertip.setAttribute("class", "hideAnimation"); }
+
+            playertip = document.getElementById("playertip");
+            var video_height = IsVideoEngine ? video.offsetHeight : $("#ck_video").offsetHeight;
+            playertip.style.top = videoBox.offsetTop + video_height - 60 + "px";
+	        playertip.style.left = document.body.clientWidth / 2 - (playertip.offsetWidth / 2) + "px";
+
+	        playertip.addEventListener("animationend", function () { playertip.setAttribute("class", "hide"); }, false);
+	        playertip.addEventListener("webkitAnimationEnd", function () { playertip.setAttribute("class", "hide"); }, false);
+	        playertip.addEventListener("mozAnimationEnd", function () { playertip.setAttribute("class", "hide"); }, false);
+	        playertip.addEventListener("MSAnimationEnd", function () { playertip.setAttribute("class", "hide"); }, false);
+        }
+        function SetWindow(element) {
+            Set = element.getElementsByTagName("p")[0];
+            element = element.getAttribute("id") == "SetBox" ? element.parentNode : element;
+            Set.onmousedown = function (e) {
+                IsMousedown = true;
+                e = e || event || window.event;
+                set_left = e.clientX - parseInt(element.style.left ? element.style.left : 0);
+                set_top = e.clientY - parseInt(element.style.top ? element.style.top : 0);
+                document.body.onmousemove = function (e) {
+                    e = e || event || window.event;
+                    if (IsMousedown) {
+                        element.style.left = e.clientX - set_left + "px";
+                        element.style.top = e.clientY - set_top + "px";
+
+                        if ((e.clientX - set_left) <= 0) element.style.left = 0 + "px";
+                        if ((e.clientY - set_top) <= 0) element.style.top = 0 + "px";
+                        if ((e.clientX - set_left) >= document.body.clientWidth - element.offsetWidth)
+                            element.style.left = document.body.clientWidth - element.offsetWidth + "px";
+                        if ((e.clientY - set_top) >= document.documentElement.clientHeight - element.offsetHeight)
+                            element.style.top = document.documentElement.clientHeight - element.offsetHeight + "px";
+                        //判断是否是Opera浏览器；
+                        if (navigator.userAgent.toLowerCase().indexOf('opera') != -1 && (e.clientY - set_top) >= document.body.clientHeight - element.offsetHeight)
+                            element.style.top = document.body.clientHeight - element.offsetHeight + "px";
+                    }
+                }
+                document.onmouseup = function () { IsMousedown = false; }
+            }
+        }
+        $("#btnadd").oncontextmenu = function () {
+            if ($("#Openlist").css("display") == "none") {
+                $("#Openlist").style.top = 400 + "px";
+                $("#Openlist").style.left = ($("#filesbox").style.left ? $("#filesbox").style.left : 0) + ($("#filesbox").offsetWidth - $("#btnadd").parentNode.offsetWidth - $("#Openlist").offsetWidth);
+                $("#Openlist").css("display", "block");
+            }
+            else { $("#Openlist").css("display", "none"); }
+            return false;
+        }
+        $("#filesbox").onmousemove = function () { box_focused = true; }
+        $("#filesbox").onmouseout = function () { box_focused = false; }
+        document.body.onclick = function (e) { if (e.target.getAttribute("id") != "btnadd") { $("#Openlist").css("display", "none"); } }
+
+        //系统title提示;
+        var poshytip = $("#poshytip-bubble");
+        $(".poshytip,.mytitle").addEvent("mouseover", function (e) { $poshytip(this,e); });
+        $(".poshytip,.mytitle,.Isposhytip").addEvent("mouseout", function () { $poshytip_destroy(this); });
+        function $poshytip(obj, e) {
+            var tip_type = obj.getAttribute("poshytip") ? obj.getAttribute("poshytip") : "title";
+            if (tip_type.toLowerCase() != "no") {
+                poshytip.html(obj.getAttribute(tip_type));
+                poshytip.css("top", e.clientY - (obj.getAttribute(tip_type).indexOf("<br>") > -1 ? 150 : 60) + "px");
+                poshytip.parentNode.className = "show";
+                obj.setAttribute("data-title", obj.getAttribute(tip_type));
+
+                var poshytipTop = (e.clientY - poshytip.offsetHeight - 8);
+                var poshytipLeft = e.clientX - (poshytip.offsetWidth * 0.15);
+                poshytipTop < 0 ? poshytip.attr("class","poshytip-bubble poshytip-bubble-top") : poshytip.attr("class","poshytip-bubble poshytip-bubble-bottom");
+                poshytip.css("top", poshytipTop < 0 ? 0 : poshytipTop + "px");
+                poshytip.css("left", poshytipLeft < 0 ? 0 : poshytipLeft + "px");
+                tip_type == "title" ? obj.removeAttribute("title") : "";
+            }
+        }
+        function $poshytip_destroy(obj) {
+            var tip_type = obj.getAttribute("poshytip") ? obj.getAttribute("poshytip") : "title";
+            if (tip_type.toLowerCase() != "no") {
+                poshytip.css("top", getOffset.top(poshytip) - 60 + "px");
+                if (tip_type == "title") {
+                    obj.setAttribute("title", obj.getAttribute("data-title"));
+                    obj.removeAttribute("data-title");
+                }
+                poshytip.parentNode.className = "hide";
+            }
+        }
+
+        //填充进度条；
+        fillRange($("#volumebar")); fillRange($("#progressbar"));
+        function fillRange(element) {
+            element.style.background = "linear-gradient(to right,#3E8EDB " + element.value + "%,#323232 0%)";
+            element.style.background = "-webkit-linear-gradient(to right, #3E8EDB " + element.value + "%,#323232 0%)";
+            element.style.background = "-ms-linear-gradient(to right, #3E8EDB " + element.value + "%,#323232 0%)";
+            element.style.background = "-o-linear-gradient(to right, #3E8EDB " + element.value + "%,#323232 0%)";
+            element.getAttribute("id") != "progressbar" && element.setAttribute("data-title", element.value + "%");
+        }
+
+        //显示隐藏功能；
+        myform.reset();
+        function ck_Show(ele) {
+            if (ele.checked) { $("#" + ele.value).css("display","inline"); }
+            else { $("#" + ele.value).css("display", "none"); }
+
+            if (ele.value == "Record" && ele.checked) { $("#fullspan").css("width", "115px"); } 
+            else if (ele.value == "Record") { $("#fullspan").css("width", "85px"); }
+        }
+        function ck_Hide(ele) {
+            if (ele.checked) {
+                $("#" + ele.value).css("display", "block");
+                $("#ck_Lock").checked = false;
+                if (locked) { Lock($("#ck_Lock")) } 
+            }
+            else { $("#" + ele.value).css("display","none"); }
+        }
+
+        //锁定；
+        function Lock(ele) {
+            locked = ele.checked;
+            if (locked) {
+                $("#ck_Filename").checked = false; $("#ck_toolbar").checked = false;
+                $("#videoFileName").css("display", "none"); $("#toolbar").css("display", "none");
+            } else {
+                $("#ck_Filename").checked = true; $("#ck_toolbar").checked = true;
+                $("#videoFileName").css("display", "block"); $("#toolbar").css("display", "block");
+            }            
+        }
+
+        //打开视频；
+        fileName.onchange = function () {
+            switch (fileName.getAttribute("loadtype")) {
+                case "subtitle": loadCheck(fileName.files, "subtitle") ? "" : showMessage(Marks[pagelangtype]["loadData_error"]); break;
+                case "poster": loadCheck(fileName.files, "poster") ? "" : showMessage(Marks[pagelangtype]["loadData_error"]); break;
+                case "flash": loadCheck(fileName.files, "flash") ? "" : showMessage(Marks[pagelangtype]["loadFlash_error"]); break;
+                default: if (Checkfile(fileName.files[0])) { getFiles(fileName.files, opened, false); } opened = true; break;
+            }
+            setAccept("file");
+            fileName.setAttribute("loadtype", "file");
+        }
+        $("#filelist").onchange = function () {
+            getFiles(this.files, opened, true);
+            opened = true;
+        }
+        function Openfile() {
+            video.playbackRate != 1 ? video.playbackRate = 1 : "";
+            clearInterval(backtime); lastplaytimes(oldcurfile);
+
+            file = myfiles[currentfile];
+            path = file.webkitRelativePath || file.mozFullPath || file.name;
+            url = getObjectURL(file);
+            
+            files_li = $("#filelistbox li");
+            $("#videoFileName").innerHTML = files_li[currentfile].getAttribute("filetitle");
+            OpenVideo(url);
+                        
+            if (file.lastplaytime) { video.currentTime = file.lastplaytime; }
+            if (currentfile != oldcurfile && oldcurfile >= 0 && oldcurfile < myfiles.length)
+                files_li[oldcurfile].style.color = "gray";
+            files_li[currentfile].style.color = "orange";
+            try {
+                var filetype = file.type ? file.type.split(/[\/|\\]/)[1].toLowerCase() : path.split('.')[path.split('.').length - 1].toLowerCase();
+                $("#icon").setAttribute("href", fileTypes["music"].indexOf(filetype) > -1 ? "images/Music_gray.ico" : "images/video.ico");
+            } catch (e) {}            
+        }
+        function OpenVideo(url) { clearInterval(swf_time);
+            if ($("#videoBox").attr("source") == "video")
+                { $("#MyVideo").setAttribute("src", url); $("#ck_video").html(""); $("#MyVideo").css("display", "block"); }
+            else if ($("#videoBox").attr("source") == "flash") {
+                if ($("#ck_video").html() == "") {
+                    var flashvars = {
+                        f: "http://" + encodeURI(url),
+                        s: 0, c: 0, p: 1, b: 0, lv: 0, e: 0, v: parseInt($("#volumebar").value), loaded: 'loadedHandler'
+                    };
+                    var params = { bgcolor: '#FFF', allowFullScreen: true, allowScriptAccess: 'always', wmode: 'transparent' };
+                    CKobject.embedSWF('ckplayer/ckplayer.swf', 'ck_video', 'flash', $("#MyVideo").css("width"), $("#MyVideo").css("height"), flashvars, params);
+
+                    var swf_param = $("#flash param[name='flashvars']").attr("value").replace("http://", '');
+                    $("#flash param[name='flashvars']").attr("value", swf_param);
+                    $("#flash embed").attr("flashvars", swf_param);
+                } else {
+                    try {
+                        var g_time = myfiles[currentfile] == undefined ? 0 : parseInt(myfiles[currentfile].lastplaytime);
+                        CkFlash.newAddress('{f->' + url + '}');
+                        CkFlash.videoSeek(isNaN(g_time) ? 0 : g_time);
+                    } catch (e) { ReLoadHandler(url); }
+                }
+                $("#ck_video").attr("furl", url);
+            }
+        }
+        function ReadPlayType(type, num, onlycheck) {
+            var curIndex = parseInt(currentfile);
+            if (playtypeed == "random")
+                curIndex = parseInt(Math.random() * (myfiles.length - 1));
+            else if (playtypeed == "select") {
+                var selectlist = document.querySelectorAll("#filelistbox li[selected='true']");
+                if (selectlist.length <= 0) { return false; }
+                else if(currentfile <= parseInt(selectlist[0].getAttribute("index")) && type == "prev"){ return false;}
+                else if (currentfile >= parseInt(selectlist[selectlist.length - 1].getAttribute("index")) && type == "next") { return false; }
+                for (var i = 0; i < selectlist.length; i++) {
+                    if (type == "prev" && currentfile > parseInt(selectlist[i].getAttribute("index"))) { curIndex = parseInt(selectlist[i].getAttribute("index")); }
+                    if (type == "next" && currentfile < parseInt(selectlist[i].getAttribute("index"))) { curIndex = parseInt(selectlist[i].getAttribute("index")); break; }
+                }
+            } else { curIndex += parseInt(num); } 
+            if (!onlycheck) { oldcurfile = currentfile; currentfile = curIndex; }
+            return true;
+        }
+        function OpenUrl(open) {
+            var urlfile = new Object(); var urlfiles = [];
+            url = prompt(Marks[pagelangtype]["promptUrl"], '');
+            urlfile.url = url; urlfile.name = url; urlfile.type = "url";
+
+            urlfiles.push(urlfile);
+            if (Checkfile(urlfile)) { getFiles(urlfiles, open, false); }
+        }
+        function addfile() {
+            opened = false;
+            fileName.click();
+        }
+        function addlist() {
+            opened = false;
+            document.getElementById("filelist").click();
+        }
+
+        //载入【字幕/歌词/海报/写真/插件】
+        function loadData(type) {
+            fileName.setAttribute("loadtype", type);
+            setAccept(type);
+            fileName.click();
+            setAccept("file");
+        }
+        function loadCheck(obj, type) {
+            for (var i = 0; i < obj.length; i++) {
+                file = obj[i];
+                path = file.webkitRelativePath || file.mozFullPath || file.name;
+                url = getObjectURL(file);
+
+                var filetype = path.split('.'); filetype = filetype[filetype.length - 1].toLowerCase();
+                switch (type.toLowerCase()) {
+                    case "poster": if (url != undefined && fileTypes["poster"].indexOf(filetype) > -1) {
+                                        video.setAttribute("poster", url); return true; } break;
+                    case "subtitle": if (url != undefined && fileTypes["subtitle"].indexOf(filetype) > -1) {
+                                        $("#videoBox track[default]").attr("src", url); return true; } break;
+                    case "flash": if (url != undefined && fileTypes["flash"].indexOf(filetype) > -1) {
+                                        $("#flash").attr("data", url); $("#flash embed").attr("src", url);return true;}break;
+                    default: return false; break;
+                }
+            }
+            return false;
+        }
+
+        //下载【字幕/歌词/海报/写真/视频/播放器】
+        function Download(type) {
+	        switch (type) {
+	            case "subtitle":downloadlink.setAttribute("href", $("#videoBox track[default='default']")[0].getAttribute("src")); break;
+	            case "poster":  downloadlink.setAttribute("href", video.getAttribute("poster"));break;
+	            case "file":    downloadlink.setAttribute("href", video.getAttribute("src"));
+	                            downloadlink.setAttribute("download", videoFileName.innerHTML); break;
+	            case "page":    downloadlink.setAttribute("href", "墨☆尘的播放器.zip"); break;
+	            default: break;
+	        }
+	        downloadlink.getAttribute("href") ? downloadlink.click() : showMessage(Marks[pagelangtype]["error_2"]) ;
+        }
+        //选择文件框【类型限制】
+        var fileTypes = {
+            "video": "|3gp|asf|asx|avi|dat|flv|f4v|rm|rmvb|qlv|mpg|mpeg|mpe|mov|mp4|m4v|mkv|mid|swf|wmv|webm|vob|vp8|ogg|ogv|aac|ape|aiff|au|cd|flac|real|mp3|mav|m3u|m4a|mod|midi|pls|wma|vqf|ra|rtmp|",
+            "music": "|asf|ogg|aac|aiff|au|ape|cd|flac|real|rm|mpeg|mp3|mav|m3u|m4a|mod|midi|ra|pls|wma|vqf|",
+            "poster": "|ai|bmp|cdr|dxf|eps|exif|fpx|gif|hdri|jpg|jpeg|pcx|psd|pcd|png|tiff|tga|svg|ufo|raw|ico|",
+            "subtitle": "|ass|vtt|idx|smi|srt|sub|ssa|rar|txt|lrc|ksc|krc|qly|snc|utf|",
+            "flash": "|fla|swf|exe|js|dll|"
+        }
+        setAccept("file");
+        function setAccept(type) {
+	        var myfiletypes = "*";
+	        type = type.toLowerCase() == "file" ? "video" : type.toLowerCase();
+	        if (["video", "poster", "subtitle", "flash"].InArray(type)) {
+	            myfiletypes = fileTypes[type].replace(/\|/g, ",."); myfiletypes = myfiletypes.replace(",.", "");
+	            myfiletypes = myfiletypes.substr(0, myfiletypes.lastIndexOf(",."));
+	        }
+	        fileName.setAttribute("accept", myfiletypes);
+        }
+        //语言【字幕语言】
+	    function switchLang(type) {
+	        if (type == "auto") {
+	            if ($("#MyVideo track[default]+track").length > 0)
+	                type = $("#MyVideo track[default]+track").attr("srclang");
+	            else
+	                type = $("#MyVideo track")[0].getAttribute("srclang");
+	        }
+	        $("#MyVideo track[default]")[0].removeAttribute("default");
+	        $("#MyVideo track[srclang='" + type + "']").attr("default", "default");
+	        
+	        $("#subtitlelang li.subtitled")[0].className = "label";
+	        $("#subtitlelang li[type='" + type + "']")[0].className = "subtitled label";
+	        if ($("#subtitlelangs menuitem[label*='√']").length > 0)
+                $("#subtitlelangs menuitem[label*='√']").attr("label", $("#subtitlelangs menuitem[label*='√']").attr("label").replace('√', ''));
+	        $("#subtitlelangs menuitem[type='" + type + "']").attr("label", $("#subtitlelangs menuitem[type='" + type + "']").attr("label") + "√");
+	    }
+        //设置最后播放时间
+        function lastplaytimes(curfile) {
+            try {
+                if (curfile >= 0 && curfile < myfiles.length) {
+                    file = myfiles[curfile];
+                    if (video.currentTime < (video.duration - 30) && video.currentTime > 3 && IsVideoEngine) //结束30s前|开始3s后
+                        file.lastplaytime = video.currentTime;
+                    else if (getFlashStatus("time") < (getFlashStatus("totalTime") - 30) && getFlashStatus("time") > 3)
+                        file.lastplaytime = getFlashStatus("time");
+                    else
+                        file.lastplaytime = 0;
+                    myfiles[curfile] = file;
+                }
+            } catch (e) {}
+        }
+        
+        function switchFlash() {            
+            if ($("#videoBox").attr("source") == "video") {
+                document.getElementById("videoBox").setAttribute("source", "flash");
+                $("#MyVideo").css("display", "none");
+                OpenVideo(video.getAttribute("src"));
+                video.setAttribute("src", "");
+            } else if ($("#videoBox").attr("source") == "flash") {
+                document.getElementById("videoBox").setAttribute("source", "video");
+                $("#MyVideo").css("display", "block");
+                OpenVideo($("#ck_video").attr("furl"));
+                document.getElementById("ck_video").innerHTML = "";
+            }
+            IsVideoEngine = $("#videoBox").attr("source") == "video";
+            showTip("&nbsp;" + $("#videoBox").attr("source") + " " + Marks[pagelangtype]["engine"] + "&nbsp;");
+        }
+        function showControls() {
+            if ($("#MyVideo").attr("controls") == "true") { $("#MyVideo").removeAttribute("controls"); $("#progressbar").parentNode.className = ""; CkFlash.changeFace(true); }
+            else { $("#MyVideo").attr("controls", "true"); $("#progressbar").parentNode.className = "hide"; CkFlash.changeFace(false); }
+        }
+
+        //播放或暂停视频；
+        function playOrpause() {
+            if ($("#videoBox").attr("source") == "video") {
+                if (video.paused == true && !isNaN(video.duration)) { video.play(); showTip(Marks[pagelangtype]["play"]); }
+                else if (!isNaN(video.duration)) { video.pause(); showTip(Marks[pagelangtype]["pause"]); }
+            }
+            else if ($("#videoBox").attr("source") == "flash") {
+                if (!getFlashStatus("play") && !isNaN(getFlashStatus("totalTime"))) { CkFlash.videoPlay(); showTip(Marks[pagelangtype]["play"]); }
+                else if (!isNaN(getFlashStatus("totalTime"))) { CkFlash.videoPause(); showTip(Marks[pagelangtype]["pause"]); }
+            }
+        }
+        //上一篇；
+        function Prevfile() {
+            if (myfiles.length == 0 || (currentfile <= 0 && ["random", "select"].InArray(playtypeed) == false)) return;
+            if (ReadPlayType("prev", -1, false) == false) return;
+            if (currentfile >= 0 && currentfile < myfiles.length) { Openfile(); showTip(Marks[pagelangtype]["prev"]); }
+        }
+        //下一篇；
+        function Nextfile() {
+            if (myfiles.length == 0 || (currentfile >= (myfiles.length - 1) && !(["loops", "random", "select"].InArray(playtypeed)) )) return;
+            if (ReadPlayType("next", 1, false) == false) return;
+            if (playtypeed == "loops" && (currentfile>= myfiles.length || currentfile < 0)) { currentfile = 0 };
+            if (currentfile >= 0 && currentfile < myfiles.length) { Openfile(); showTip(Marks[pagelangtype]["next"]); }
+        }
+        //停止；
+        function Stop() {
+            video.currentTime = 0; video.pause();
+            if ($("#videoBox").attr("source") == "flash") { CkFlash.videoSeek(0); CkFlash.videoPause(); }
+            showTip(Marks[pagelangtype]["stop"]);
+        }
+        //重新播放；
+        function BackRate() {
+            video.playbackRate != 1 ? video.playbackRate = 1 : "";
+            clearInterval(backtime); showTip(Marks[pagelangtype]["backRate"]);
+            if ($("#videoBox").attr("source") == "flash") {
+                try { CkFlash.videoSeek(0); CkFlash.videoPlay(); } catch (e) { ReLoadHandler(""); }
+            } video.load();
+        }
+        //播放方式；
+        var mpt = $("#mymenu .ptypes"); var pt = $("#PlayingType li");
+        function SwitchType() {
+            switch (playtypeed.toLowerCase()) {
+                case "one": playtypeed = "again"; break;
+                case "again": playtypeed = "order"; break;
+                case "order": playtypeed = "select"; break;
+                case "select": playtypeed = "random"; break;
+                case "random": playtypeed = "loops"; break;
+                case "loops": playtypeed = "one"; break;
+            }
+            setPlaytype(true);
+        }
+        function setPlaytype(IsShowTip) {
+            playmodel = $("#playmodel");
+            playtypeed = playtypeed.toLowerCase();
+            for (var j = 0; j < pt.length; j++) {
+                playtypeed == pt[j].getAttribute("type") ? pt[j].className = "ptype label" : pt[j].className = "label";
+                playtypeed == mpt[j].getAttribute("type") ? mpt[j].setAttribute("label", mpt[j].getAttribute("label").replace('√', '') + "√") : mpt[j].setAttribute("label", mpt[j].getAttribute("label").replace('√', ''));
+            }
+
+            if (playtypeed == "again") { video.loop = true; } else { video.loop = undefined; }
+            if ($("#videoBox").attr("source") == "flash" && playtypeed == "again") { CkFlash.changeFlashvars('{e->1}'); } else if ($("#videoBox").attr("source") == "flash") { CkFlash.changeFlashvars('{e->0}'); }
+            playmodel.attr("src", "images/" + (playtypeed == "select" ? "list" : "play_" + playtypeed) + ".ico");
+            ["order","one","select"].InArray(playtypeed) ? playmodel.attr("height", "16") : playmodel.attr("height", "26");
+
+            playmodel.attr("lang", "pt" + playtypeed.replace(/(\w)/, function (v) { return v.toUpperCase()}));
+            playmodel.attr("data-title", Marks[pagelangtype][playmodel.attr("lang")]);
+            if (IsShowTip) { showTip(Marks[pagelangtype][playmodel.attr("lang")]); }
+        }
+        $("#PlayingType li,#mymenu .ptypes").addEvent("click", function () {
+            playtypeed = this.getAttribute("type"); setPlaytype(true);
+        });
+
+        //设置音量[0~1]；
+        $("#volumebar").addEventListener("mousemove", function (e) {
+            if (video.volume != $("#volumebar").value / 100 && !(video.muted && $("#volumebar").value == 0)) {
+                video.volume = $("#volumebar").value / 100; video.muted = false;
+                if ($("#videoBox").attr("source") == "flash") { CkFlash.changeVolume(parseInt($("#volumebar").value)); }
+                showTip(Marks[pagelangtype]["volume"] + "(" + $("#volumebar").value + "%)");
+                fillRange($("#volumebar")); $poshytip(this, e);
+            }
+        }, false);
+        function SetRisevolume() {
+            if (video.volume >= 1) { return false; }
+            if (video.volume >= 0.9 && video.volume <= 1) { video.volume = 1; }
+            if (video.volume <= 1) {
+                video.volume == 1 ? video.volume = 1 : video.volume += 0.1; $("#volumebar").value = parseInt(video.volume * 1.0 * 100);
+                if ($("#videoBox").attr("source") == "flash") { CkFlash.changeVolume(parseInt($("#volumebar").value)); }
+                showTip(Marks[pagelangtype]["volume"] + "(" + $("#volumebar").value + "%)"); fillRange($("#volumebar"));
+            }
+        }
+        function SetDropvolume() {
+            if (video.volume <= 0) { return false;}
+            if (video.volume > 0 && video.volume <= 0.1) { video.volume = 0;}
+            if (video.volume >= 0) {
+                video.volume == 0 ? video.volume = 0 : video.volume -= 0.1; $("#volumebar").value = parseInt(video.volume * 1.0 * 100);
+                if ($("#videoBox").attr("source") == "flash") { CkFlash.changeVolume(parseInt($("#volumebar").value)); }
+                showTip(Marks[pagelangtype]["volume"] + "(" + $("#volumebar").value + "%)"); fillRange($("#volumebar"));
+            }
+        }
+
+        //设置 进度条；
+        var progressbar = $("#progressbar");
+        progressbar.addEventListener("change", function () {
+            var currentTime;
+            if (!isNaN(video.duration)) { currentTime = video.currentTime = this.value / 100 * video.duration; }
+            if ($("#videoBox").attr("source") == "flash" && !isNaN(getFlashStatus("totalTime"))) {
+                currentTime = this.value / 100 * getFlashStatus("totalTime");
+                CkFlash.videoSeek(parseInt(currentTime));
+            }
+            fillRange(this); showTip(formatSeconds(currentTime));
+        }, false);
+        progressbar.parentNode.addEventListener("mouseover", function () {
+            this.style.marginTop = "-12px";
+            progressbar.css("height", (progressbar.offsetHeight) * 4 + "px"); progressbar.className = "nothumb";
+            progressbar.css("box-shadow", "1px 0px 1px #888888");
+        }, false);
+        progressbar.parentNode.addEventListener("mouseout", function () {
+            this.style.marginTop = "-5px";
+            progressbar.css("height", (progressbar.offsetHeight) / 4 + "px"); progressbar.className = "";
+            progressbar.css("box-shadow", "0px 0px 0px #323232");
+        }, false);
+        progressbar.addEventListener("mousemove", function (event) {
+            var event = event || window.event || arguments[0];
+            if (IsVideoEngine)
+                this.setAttribute("data-title", formatSeconds((event.clientX - getOffset.left(this)) * (isNaN(video.duration) ? 0 : video.duration) / this.offsetWidth));
+            else if (typeof (CKobject.getObjectById("flash").getStatus) != "undefined")
+                this.setAttribute("data-title", formatSeconds((event.clientX - getOffset.left(this)) * (isNaN(getFlashStatus("totalTime")) ? 0 : getFlashStatus("totalTime")) / this.offsetWidth));
+            $poshytip(this, event);
+        }, false);
+
+        //快进 kktime 默认10秒；
+        function FF(krtime) {
+            if (kktime != krtime) { ResetFForRew(krtime); }
+            if (!isNaN(video.duration)) { video.currentTime += kktime; showTip(Marks[pagelangtype]["ff" + kktime]); }
+            if ($("#videoBox").attr("source") == "flash" && !isNaN(getFlashStatus("totalTime"))) { CkFlash.videoSeek(parseInt(getFlashStatus("time") + kktime)); showTip(Marks[pagelangtype]["ff" + kktime]); }
+        }
+        //快退 kktime 默认10秒；
+        function Rew(krtime) {
+            if (kktime != krtime) { ResetFForRew(krtime); }
+            if (!isNaN(video.duration)) { video.currentTime -= kktime; showTip(Marks[pagelangtype]["rew" + kktime]); }
+            if ($("#videoBox").attr("source") == "flash" && !isNaN(getFlashStatus("totalTime"))) { CkFlash.videoSeek(parseInt(getFlashStatus("time") - kktime)); showTip(Marks[pagelangtype]["rew" + kktime]); }
+        }
+        //重置 快进|快退 时间
+        function ResetFForRew(krtime) {
+            $("#rightMenu .kktime").attr("class", "label kktime");
+            $("#rightMenu .kktime + lable").html("");
+            $("#rightMenu .kktime[lang='ff" + krtime + "'],#rightMenu .kktime[lang='rew" + krtime + "']").attr("class", "label kktime subtimeed");
+            $("#rightMenu .kktime[lang='ff" + krtime + "'] + lable").html("→"); $("#rightMenu .kktime[lang='rew" + krtime + "'] + lable").html("←");
+
+            var froptions = $("#mymenu .kktime[label*='→'],#mymenu .kktime[label*='←']");
+            for (var j = 0; j < froptions.length; j++) { froptions[j].setAttribute("label", froptions[j].getAttribute("label").replace('(→)', '').replace('(←)', '')); }
+            $("#mymenu .kktime[lang='menu_ff" + krtime + "']").attr("label", $("#mymenu .kktime[lang='menu_ff" + krtime + "']").attr("label") + "(→)");
+            $("#mymenu .kktime[lang='menu_rew" + krtime + "']").attr("label", $("#mymenu .kktime[lang='menu_rew" + krtime + "']").attr("label") + "(←)");
+
+            kktime = krtime;
+        }
+        //静音按钮；
+        function Mute() {
+            if (video.muted) {
+                video.muted = false; showTip(Marks[pagelangtype]["cancelVolume"]);
+                $("#volumebar").value = parseInt(video.volume * 1.0 * 100); fillRange($("#volumebar"));                
+            } else {
+                video.muted = true; showTip(Marks[pagelangtype]["mute"]);
+                $("#volumebar").value = 0; fillRange($("#volumebar"));
+            }
+            if ($("#videoBox").attr("source") == "flash") { video.muted ? CkFlash.changeVolume(0) : CkFlash.changeVolume(parseInt(video.volume * 1.0 * 100)); }
+        }
+        //加速播放(N倍速度)；
+        function Speed(velocity) {
+            video.playbackRate = typeof (velocity) == "number" ? velocity : video.playbackRate + 1;
+            showTip(Marks[pagelangtype]["speed"].replace("3", video.playbackRate));
+            setbacktime();
+        }
+        //减速播放(慢N倍)；
+        function Slower(velocity) {
+            video.playbackRate = typeof (velocity) == "number" ? 1 / velocity : 1 / (parseInt(1 / video.playbackRate) + 1);
+            showTip(Marks[pagelangtype]["slower"].replace("3", parseInt(1 / video.playbackRate)));
+            setbacktime();
+        }
+        //恢复正常倍速；
+        function Normal() {
+            video.playbackRate = 1; showTip(Marks[pagelangtype]["normal"]);            
+        }
+        //回放
+        function StepBack() {
+            if (video.playbackRate >= 0) { video.playbackRate = 1; video.playbackRate = -1; }
+            else { video.playbackRate = video.playbackRate - 1; }
+            clearInterval(backtime); showTip(Marks[pagelangtype]["stepBack"]);
+
+            backtime = setInterval(function () {
+                if ((IsVideoEngine && video.paused) || video.playbackRate >= 0 || (!IsVideoEngine && !getFlashStatus("play"))) { video.playbackRate = 1; clearInterval(backtime); }                
+                if (IsVideoEngine && video.currentTime > 1) { video.currentTime += (video.playbackRate - 1); }
+                else if (!IsVideoEngine && getFlashStatus("time") > 2) { CkFlash.videoSeek(parseInt(getFlashStatus("time") + video.playbackRate - 1.8)); }
+                else { Stop(); video.playbackRate = 1; clearInterval(backtime); }
+            }, 800);
+        }
+        function setbacktime() {
+            clearInterval(backtime);
+            if ($("#videoBox").attr("source") == "flash") {
+                backtime = setInterval(function () {
+                    if (!getFlashStatus("play") || video.playbackRate == 1) { clearInterval(backtime); }
+                    else { CkFlash.videoSeek(parseInt(getFlashStatus("time") + video.playbackRate - 0.8)); }
+                }, 800);
+            }
+        }
+        
+        //将秒数换成时分秒格式；
+        function formatSeconds(value) {
+            var theTime = isNaN(value) ? 0 : parseInt(value); // 秒
+            var theTime1 = 0; /* 分钟 */var theTime2 = 0; // 小时
+
+            if (theTime > 60) {
+                theTime1 = parseInt(theTime / 60);
+                theTime = parseInt(theTime % 60);
+                if (theTime1 > 60) {
+                    theTime2 = parseInt(theTime1 / 60);
+                    theTime1 = parseInt(theTime1 % 60);
+                }
+            }
+            // 补零
+            var zero = function (v) { return (v >> 0) < 10 ? "0" + v : v; };
+
+            if (theTime2 > 0) {
+                return [zero(theTime2), zero(theTime1), zero(theTime)].join(":");
+            }
+            else {
+                return [zero(theTime1), zero(theTime)].join(":");
+            }
+        }
+        
+        //键盘触发事件；
+        var keyevent = null;
+        document.onkeydown = keydown; 
+        function keydown(e) {
+            if (locked==true)//判断是否锁定；
+                return;
+            var e = e || event || window.event || arguments[0]; 
+            keyevent = e; 
+            var currKey = e.keyCode || e.which || e.charCode;
+            if (!(navigator.appName == "Microsoft Internet Explorer") || (window.navigator.userAgent.indexOf('Chrome') != -1))
+                if (currKey == 32 && (navigator.userAgent.indexOf("Firefox") > -1))//火狐截止Spance 空格；
+                    return;
+            //组合键；
+            if (e.altKey && e.ctrlKey && currKey==70)
+                loadData('flash');      //ctrl+alt+F:载入插件；
+            if (e.altKey && [38, 40, 46, 76, 77, 79, 80, 83, 85, 86].InArray(currKey)) {
+                if (currKey == 38)
+                    Movefiles(true);    //alt+↑:文件上移；
+                else if(currKey == 40)
+                    Movefiles(false);   //alt+↓:文件下移；
+                else if (currKey == 46)
+                    clearFiles(true);   //alt+Del:清空列表；
+                else if (currKey == 77)
+                    Mute();             //alt+M:静音；
+                else if (currKey == 79)
+                    addfile();          //alt+O:添加文件；
+                else if (currKey == 76)
+                    addlist();          //alt+L:添加文件夹；
+                else if (currKey == 85)
+                    OpenUrl(false);     //alt+U:添加URL；
+                else if (currKey == 86)
+                    loadData("subtitle");//alt+V:载入字幕/歌词；
+                else if (currKey == 80)
+                    loadData("poster"); //alt+P:载入海报/写真；
+                else if (currKey == 83)
+                    SwitchType();       //alt+S:切换播放模式；
+                return false;
+            }
+            if (e.ctrlKey && ((currKey >= 37 && currKey <= 40) || currKey == 79)) {
+                if (currKey == 38)
+                    Normal();   //正常ctrl+↑；
+                else if (currKey == 37)
+                    StepBack(); //回放ctrl+←；
+                else if (currKey == 39)
+                    Speed();    //加速ctrl+→；
+                else if (currKey == 40)
+                    Slower();   //减速ctrl+↓；                
+                else if (currKey == 79)
+                    fileName.click(); //ctrl+O:打开文件；
+                //else if (currKey == 86) Pastefile();//ctrl+V：粘贴；
+                return false;
+            }
+            if (e.shiftKey && [67, 70,76, 79, 80, 83, 85, 89].InArray(currKey)) {
+                if (currKey == 83)
+                    showSet();          //shift+S:设置中心；
+                else if (currKey == 70)
+                    switchFlash();      //shift+F:切换FLASH；
+                else if (currKey == 79)
+                    filelist.click();   //shift+O:打开文件夹；
+                else if (currKey == 76)
+                    showFiles();        //shift+L:播放列表；
+                else if (currKey == 85)
+                    OpenUrl(true);      //shift+U:打开URL；
+                else if (currKey == 80)
+                    switchPageLang("auto"); //shift+P:切换页面语言；
+                else if (currKey == 89)
+                    switchLang("auto"); //shift+Y:切换字幕语言；
+                else if (currKey == 67)
+                    showControls();      //shift+C:进度条；
+                return false;
+            }
+            //快捷键【参考-keycode对照表】；
+            if ([13, 46, 122].InArray(currKey) || (currKey >= 32 && currKey <= 40)) {
+                switch (currKey) {
+                    case 13: $("#messageBox").css("display") == "block" ? $("#messageBox").css("display", "none") 
+                           : FullScreen(); break;       //[回车]:画面全屏；
+                    case 32: playOrpause(); break;      //[空格]:暂停|播放；
+                    case 33: Prevfile(); break;         //[PageUp]:上一篇；
+                    case 34: Nextfile(); break;         //[PageDown]:下一篇；
+                    case 35: Stop(); break;             //[End]:停止；
+                    case 36: BackRate(); break;         //[Home]:重播；
+                    case 37: Rew(kktime); break;        //[方向键左]:快退；
+                    case 38: SetRisevolume(); break;    //[方向键上]:音量++；
+                    case 39: FF(kktime); break;         //[方向键右]:快进；
+                    case 40: SetDropvolume();break;     //[方向键下]:音量--；
+                    case 46: clearFiles(false); break;  //[Delete]:清除文件；
+                    case 122: FullScreen_F11();break;   //[F11]:界面全屏；
+                }
+                return false;
+            }
+        }
+        document.onkeyup = function (e) {
+            keyevent = null;
+        }
+
+        //鼠标滚动触发事件detail只取±3，wheelDelta只取±120；
+        var scrollFunc = function (e) {
+            e = e || window.event;
+            if (box_focused) { return true; }
+            if (e.wheelDelta) {//IE/Opera/Chrome
+                if (e.wheelDelta > 0) SetRisevolume();
+                else SetDropvolume();
+            } else if (e.detail) {//Firefox
+                if (e.detail < 0) SetRisevolume();
+                else SetDropvolume();
+            }
+        }
+        //注册事件；
+        if (document.addEventListener) { video.addEventListener('DOMMouseScroll', scrollFunc, false); }
+        window.onmousewheel = document.onmousewheel = scrollFunc; //IE/Opera/Chrome/Safari；
+
+        var img_playOrpause = document.getElementById("img_playOrpause");
+        //当前网络状态；
+        video.addEventListener("progress", function (e) {
+            var networkStateDisplay = document.getElementById("networkState");
+            switch (video.networkState) {
+                case 0: showMessage(Marks[pagelangtype]["progress_error_0"]); break;
+                //case 1: showMessage(Marks[pagelangtype]["progress_error_1"]); break;          
+                //case 2: networkStateDisplay.innerHTML = Marks[pagelangtype]["loading"]+"[" + e.loaded + "/" + e.total + "byte]"; break;    
+                //case 3: networkStateDisplay.innerHTML = Marks[pagelangtype]["load_error"]; break; 
+            }
+        }, false);
+        //发生错误；
+        video.addEventListener("error", function myfunction() {
+            switch (video.error.code) {
+                case 1: showMessage(Marks[pagelangtype]["error_1"]); break;
+                case 2: showMessage(Marks[pagelangtype]["error_2"]); break;
+                case 3: showMessage(Marks[pagelangtype]["error_3"]); break;
+                case 4: if (video.getAttribute("src") != "") {
+                        if (myfiles[currentfile].type == "application/x-shockwave-flash" || (myfiles[currentfile].type == "url" && myfiles[currentfile].name.indexOf(".swf") > 0)) {
+                            $("#ck_video").html('<div style="width:' + $("#MyVideo").css("width") + ';height:' + $("#MyVideo").css("height") + '"><div style="width:100%;height:100%" id="full_video">'
+                                + '<embed width="100%" height="100%" name="plugin" id="plugin" src="' + video.getAttribute("src") + '" type="application/x-shockwave-flash"></div></div>');
+                            $("#MyVideo").css("display", "none"); video.setAttribute("src", "");
+                            var duration = myfiles[currentfile].name.indexOf("RJ137680") > 0 ? 20 : 0; var currentTime = 1; //单位秒
+                            if (myfiles[currentfile].name.split(".swf").length == 3) { duration = myfiles[currentfile].name.split(".swf")[1]; }
+                            if (!isNaN(duration) && duration > 0) {
+                                swf_time = setInterval(function () {
+                                    currentTime += 1; progressbar.value = (currentTime * 100 / duration).toFixed(3); fillRange(progressbar); $("#VTime").html(formatSeconds(currentTime) + "/" + formatSeconds(duration));
+                                    if (currentTime >= duration && (playtypeed == "again" || myfiles.length <= 1)) { currentTime = 0; }
+                                    else if (currentTime >= duration) { $("#ck_video").html(""); $("#MyVideo").css("display", "block"); Nextfile(); clearInterval(swf_time); }
+                                }, 1000);
+                            }
+                        }
+                        else { showMessage(Marks[pagelangtype]["error_4"]); }
+                    } break;
+                default: break;
+            }
+        }, false);
+        //监听当前播放进度；
+        function timeHandler(Number) {            
+            var currentTime = IsVideoEngine ? video.currentTime : getFlashStatus("time");
+            var duration = IsVideoEngine ? video.duration : getFlashStatus("totalTime");
+            //var paused = IsVideoEngine ? video.paused : !getFlashStatus("play");
+
+            document.getElementById("VTime").innerHTML = formatSeconds(currentTime) + "/" + formatSeconds(duration);
+            progressbar.value = (currentTime * 100 / duration).toFixed(3); fillRange(progressbar);
+            //paused ? img_playOrpause.setAttribute("src", "images/play.ico") : img_playOrpause.setAttribute("src", "images/pause.ico");
+        }
+        video.addEventListener("timeupdate", timeHandler, false);
+        //监听播放|暂停事件；
+        function playOrPauseEvent(IsPaused) {
+            var keyName = "pause";
+            if ((IsVideoEngine && video.paused) || ($("#videoBox").attr("source") == "flash") && IsPaused)
+                keyName = "play";
+
+            document.getElementById("MyP").setAttribute("lang", keyName);
+            document.getElementById("MyP").innerHTML = Marks[pagelangtype][keyName];
+            img_playOrpause.setAttribute("src", "images/" + keyName + ".ico");
+        }
+        video.addEventListener("playing", playOrPauseEvent, false);
+        video.addEventListener("pause", playOrPauseEvent, false);
+        //监听音量事件；
+        function flashVolume(volume) { video.volume = getFlashStatus("volume") / 100; }
+        //监听静音事件；
+        function flashMuted(muted) { video.muted = muted; }
+        video.addEventListener("volumechange", function () {
+            if (video.muted) {
+                $("#mMute").setAttribute("lang", "menu_cancelVolume"); $("#MyMute").setAttribute("lang", "cancelVolume");
+                $("#mMute").setAttribute("label", Marks[pagelangtype]["menu_cancelVolume"]); $("#MyMute").innerHTML = Marks[pagelangtype]["cancelVolume"];
+                document.getElementById("img_volume").setAttribute("src", "images/Mute.ico");
+            } else {
+                $("#mMute").setAttribute("lang", "menu_mute"); $("#MyMute").setAttribute("lang", "mute");
+                $("#mMute").setAttribute("label", Marks[pagelangtype]["menu_mute"]); $("#MyMute").innerHTML = Marks[pagelangtype]["mute"];
+                document.getElementById("img_volume").setAttribute("src", "images/Volume.ico");
+                $("#volumebar").value = parseInt(video.volume * 1.0 * 100); fillRange($("#volumebar"));
+            }
+        }, false);
+        //监听视频播放结束事件；
+        function playerstop() {
+            lastplaytimes(currentfile);
+            if (myfiles.length == 0 || (currentfile >= (myfiles.length - 1) && playtypeed == "order") || playtypeed == "one" || (!ReadPlayType("next", 1, true) && playtypeed == "select")) {
+                showMessage(Marks[pagelangtype]["playOver"]);
+                document.getElementById("videoFileName").innerHTML = Marks[pagelangtype]["pagetitle"];
+                video.setAttribute("src", ""); return;
+            } else { Nextfile(); }
+        }
+        video.addEventListener("ended", playerstop, false);
+
+        //鼠标单击Video事件；
+        video.onclick = function (e) {
+            //判断否是Firefox还是其他浏览器；
+            if (navigator.userAgent.indexOf("Firefox") < 0) {
+                if ($("this").attr("id") == "MyVideo")
+                    playOrpause();
+            } //if (e.clientY < (videoBox.offsetTop + video.offsetHeight - 30))
+        }
+        //鼠标双击Video全屏事件；
+        video.ondblclick = function () { FullScreen(); return; }
+        if (window.navigator.userAgent.indexOf("Firefox") < 0)
+            RightMenu();
+
+        //加载 flash事件；        
+        function loadedHandler() {
+            CkFlash = CKobject.getObjectById("flash");
+
+            CkFlash.addListener("muted", "flashMuted");
+            CkFlash.addListener("volumechange", "flashVolume");
+            CkFlash.addListener("paused", "playOrPauseEvent");
+            CkFlash.addListener("time", "timeHandler");
+
+            CkFlash.addListener("controlBarShow", "controlHandler");
+            if ($("#MyVideo").attr("controls") != "true") { CkFlash.changeFace(true); }
+        }
+        function controlHandler(is) {
+            if (getFlashStatus("controlBarShow") && getFlashStatus("play") && $("#MyVideo").attr("controls") != "true")
+                CkFlash.changeFace(true);
+        }
+        function ReLoadHandler(furl) {
+            progressbar.value = 0; fillRange(progressbar);
+            var swf_param = $("#flash param[name='flashvars']").attr("value");
+            furl = furl.length > 0 ? furl : $("#ck_video").attr("furl");
+            swf_param = "f=" + encodeURI(furl) + swf_param.substring(swf_param.lastIndexOf('&s=0')).replace(/&c=0|&b=0|&loaded=loadedHandler/g, '');
+            $("#flash param[name='flashvars']").attr("value", swf_param); $("#flash embed").attr("flashvars", swf_param);
+            swf_param = $("#ck_video").html(); $("#ck_video").html(swf_param); $("#flash embed")[0].focus();
+        }
+        function getFlashStatus(name) { return CKobject.getObjectById("flash").getStatus()[name]; }
+
+        //全屏控制；
+        function FullScreen() {
+            //检查浏览器是否处于全屏状态；
+            var element = IsVideoEngine ? $("#MyVideo") : $("#ck_video");
+            element = IsVideoEngine && $("#MyVideo").css("display") == "none" ? $("#full_video") : element;
+            if (invokeFieldOrMethod(document, 'FullScreen') || invokeFieldOrMethod(document, 'IsFullScreen') || document.IsFullScreen) {
+                exitFullscreen(element); //$("#MyFullScreen").html("全屏");
+            }
+            else {
+                launchFullscreen(element); //$("#MyFullScreen").html("退出全屏");
+            }
+        }
+        function FullScreen_F11() {
+            var WsShell = typeof(ActiveXObject) == "undefined" ? "" : new ActiveXObject('WScript.Shell');
+            if (WsShell)
+                WsShell.SendKeys('{F11}');
+            else {                
+                if (invokeFieldOrMethod(document, 'FullScreen') || invokeFieldOrMethod(document, 'IsFullScreen') || document.IsFullScreen)
+                    exitFullscreen(document.body);
+                else
+                    launchFullscreen(document.body);
+            }
+        }
+        //反射調用；
+        var invokeFieldOrMethod = function (element, method) {
+            var usablePrefixMethod;
+            ["webkit", "moz", "ms", "o", ""].forEach(function (prefix) {
+                if (usablePrefixMethod) return;
+                if (prefix === "") {
+                    // 无前缀，方法首字母小写
+                    method = method.slice(0, 1).toLowerCase() + method.slice(1);
+                }
+                var typePrefixMethod = typeof element[prefix + method];
+                if (typePrefixMethod + "" !== "undefined") {
+                    if (typePrefixMethod === "function") {
+                        usablePrefixMethod = element[prefix + method]();
+                    } else {
+                        usablePrefixMethod = element[prefix + method];
+                    }
+                }
+            });
+            return usablePrefixMethod;
+        };
+        //进入全屏；
+        function launchFullscreen(element) {
+            //此方法不可以在异步任务中执行，否则火狐无法全屏；
+            if (element.requestFullscreen) {
+                element.requestFullscreen(); //W3C
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen(); // Firefox
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullScreen(); //Safari5.1 and Chrome 15
+            } else if (element.oRequestFullscreen) {
+                element.oRequestFullscreen(); //
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen(); //
+            } else {
+                var cssText = 'width:100%;height:100%;overflow:hidden;';
+                document.documentElement.style.cssText = cssText;
+                document.body.style.cssText = cssText;
+                element.style.cssText = cssText + ';' + 'margin:0px;padding:0px;';
+                document.IsFullScreen = true;
+            }
+        }
+        //退出全屏；
+        function exitFullscreen(element) {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.oRequestFullscreen) {
+                document.oCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else {
+                document.documentElement.style.cssText = "";
+                document.body.style.cssText = "";
+                element.style.cssText = "";
+                document.IsFullScreen = false;
+            }
+        }
+
+        //非Firefox自定义右键菜单；
+        if (window.navigator.userAgent.indexOf("Firefox") < 0) 
+            RightMenu();
+        var getOffset = {
+            top: function (obj) {
+                return obj.offsetTop + (obj.offsetParent ? arguments.callee(obj.offsetParent) : 0) },
+            left: function (obj) {
+                return obj.offsetLeft + (obj.offsetParent ? arguments.callee(obj.offsetParent) : 0) }
+        };
+        function RightMenu() {
+            var oMenu = $("#rightMenu");
+            var aUl = oMenu.getElementsByTagName("ul");
+            var aLi = oMenu.getElementsByTagName("li");
+            var showTimer = hideTimer = null;
+            var i = 0;
+            var maxWidth = maxHeight = 0;
+            var aDoc = [document.documentElement.offsetWidth, $("#videoBox").offsetHeight];
+
+            var move_rightmenu = function () {
+                oThis = this;
+                var oUl = oThis.getElementsByTagName("ul");
+                //鼠标移入样式；
+                oThis.className += " active";
+                //显示子菜单
+                if (oUl[0]) {
+                    clearTimeout(hideTimer);
+                    showTimer = setTimeout(function () {
+                        for (i = 0; i < oThis.parentNode.children.length; i++) {
+                            oThis.parentNode.children[i].getElementsByTagName("ul")[0] &&
+                            (oThis.parentNode.children[i].getElementsByTagName("ul")[0].style.display = "none");
+                        }
+                        oUl[0].style.display = "block";
+                        oUl[0].style.top = oThis.offsetTop + "px";
+                        oUl[0].style.left = oThis.offsetWidth + "px";
+                        setWidth(oUl[0]);
+
+                        //最大显示范围					
+                        maxWidth = aDoc[0] - oUl[0].offsetWidth;
+                        maxHeight = aDoc[1] - oUl[0].offsetHeight;
+
+                        //防止溢出
+                        maxWidth < getOffset.left(oUl[0]) && (oUl[0].style.left = -oUl[0].clientWidth + "px");
+                        maxHeight < getOffset.top(oUl[0]) && (oUl[0].style.top = -oUl[0].clientHeight + oThis.offsetTop + oThis.clientHeight + "px")
+                    }, 300);
+                }
+            };
+            for (i = 0; i < aLi.length; i++) {
+                //为含有子菜单的li加上箭头；
+                aLi[i].getElementsByTagName("ul")[0] && (aLi[i].className = "sub");
+                //鼠标移入子菜单；
+                aLi[i].addEventListener("mouseover", move_rightmenu, false);
+                if (aLi[i].getAttribute("rightmenu") == "true")
+                    aLi[i].addEventListener("click", move_rightmenu, false);
+                //鼠标移出子菜单；	
+                aLi[i].onmouseout = function () {
+                    var oThis = this;
+                    var oUl = oThis.getElementsByTagName("ul");
+                    //鼠标移出样式
+                    oThis.className = oThis.className.replace(/ active/g, "");
+
+                    clearTimeout(showTimer);
+                    hideTimer = setTimeout(function () {
+                        for (i = 0; i < oThis.parentNode.children.length; i++) {
+                            oThis.parentNode.children[i].getElementsByTagName("ul")[0] &&
+                        (oThis.parentNode.children[i].getElementsByTagName("ul")[0].style.display = "none");
+                        }
+                    }, 300);
+                };
+            }
+
+            //自定义右键菜单；
+            function ShowMenu(clientX, clientY) {
+                oMenu.style.display = "block";
+                oMenu.style.left = clientX + "px";
+                oMenu.style.top = clientY +"px";
+                setWidth(aUl[0]);
+                //最大显示范围
+                maxWidth = aDoc[0] - oMenu.offsetWidth;
+                maxHeight = aDoc[1] - oMenu.offsetHeight;
+                //防止菜单溢出
+                oMenu.offsetTop > maxHeight && (oMenu.style.top = maxHeight + "px");
+                oMenu.offsetLeft > maxWidth && (oMenu.style.left = maxWidth + "px");
+            }
+            video.oncontextmenu = function (event) {
+                var event = event || window.event || arguments[0];
+                ShowMenu(event.clientX, event.clientY);
+                return false;
+            };
+            $("#rightlist").addEvent("click", function () {
+                ShowMenu($("#videoBox").offsetLeft + 15, $("#videoBox").offsetTop + 75);
+                return false;
+            });
+
+            //点击隐藏菜单；
+            document.onclick = function (e) {
+                if ($("this").attr("id") != "rightlist" && $("this").attr("rightmenu") != "true")
+                    oMenu.style.display = "none";
+            };
+
+            //取li中最大的宽度, 并赋给同级所有li；	
+            function setWidth(obj) {
+                maxWidth = 0; for (i = 0; i < obj.children.length; i++) { var oLi = obj.children[i];
+                var iWidth = oLi.clientWidth - parseInt(oLi.currentStyle ? oLi.currentStyle["paddingLeft"] : getComputedStyle(oLi, null)["paddingLeft"])
+                if (iWidth > maxWidth) maxWidth = iWidth; } maxWidth += 15;
+
+                for (i = 0; i < obj.children.length; i++) obj.children[i].style.width = 140 + "px";
+            }
+        };
+
+        //屏幕调整-单选按钮；
+        function Setscreen(value) {
+            $("#rd_screen .bglabel")[0].className = "";
+            $("#rd_screen input[value='" + value + "']+label")[0].className = "bglabel";
+
+            switch (value) {
+                case "3:4": rangeChange("width", 25); rangeChange("height", 30);break;
+                case "5:8": rangeChange("width", 50); rangeChange("height", 50);break;
+                case "8:16":rangeChange("width", 100); rangeChange("height", 100); break;
+            }
+            adjustSrceen();
+        };
+        //屏幕调整-宽高 百分条；
+        $("#rangeBox,#rangeBox2").addEvent("mousemove", function (e) {
+            this.getAttribute("id")=="rangeBox" ? rangeChange("width",$("#rangeBox").value) : rangeChange("height",$("#rangeBox2").value);
+            adjustSrceen();
+            $poshytip(this, e);
+        });
+        //屏幕调整；
+        function rangeChange(obj, rangeValue) {
+            if (obj == "width") {
+                $("#rangeBox").value = rangeValue;
+                $("#rangeResult").innerHTML = rangeValue + "%"; fillRange($("#rangeBox"));
+            } else {
+                $("#rangeBox2").value = rangeValue;
+                $("#rangeResult2").innerHTML = rangeValue + "%"; fillRange($("#rangeBox2"));
+            }
+        }
+        function adjustSrceen() {
+            var videoBox = $("#videoBox"); var rangeBox = $("#rangeBox"); var rangeBox2 = $("#rangeBox2");
+            var offWidth; var offHeight;
+
+            video.style.width = offWidth = ((16 * rangeBox.value) > parseFloat(document.body.clientWidth) ? parseFloat(document.body.clientWidth) : (16 * rangeBox.value)) + "px";
+            video.style.height = offHeight = ((10 * rangeBox2.value) > parseFloat(HtmlHeight) - 70 ? parseFloat(HtmlHeight) - 70 : (10 * rangeBox2.value)) + "px";
+
+            video.style.margin = "0px";
+            if (rangeBox.value < 50 && rangeBox2.value < 50) {
+                videoBox.style.width = (800 > parseFloat(document.body.clientWidth) - 10 ? parseFloat(document.body.clientWidth) : 800) + "px";
+                videoBox.style.height = offWidth = (570 > parseFloat(HtmlHeight) - 10 ? parseFloat(HtmlHeight) : 570) + "px";
+                video.style.margin = (parseFloat(offWidth) - parseFloat(offHeight)) / 2 + "px auto";
+            }
+            else {
+                videoBox.style.height = (parseFloat(offHeight) + 70) > parseFloat(HtmlHeight) ? (parseFloat(HtmlHeight) + "px") : (parseFloat(offHeight) + 70 + "px");
+                videoBox.style.width = parseFloat(offWidth) > parseFloat(document.body.clientWidth) ? parseFloat(document.body.clientWidth) + "px" : parseFloat(offWidth) + "px";
+            }
+            ChangeScreen();
+        }
+        function ChangeScreen() {
+            $("#videoFileName").style.width = $("#videoBox").offsetWidth + "px";
+            $("#toolbar").style.width = $("#videoBox").offsetWidth + "px";
+            if ($("#toolbar").offsetWidth < 800) {$("#toolbar #volumebar").css("margin", "13px 0 0 0"); $("#toolbar span").css("margin", "0px"); $("#fullspan").css("display", "none"); }
+
+            $("#videoBox").style.marginLeft = -(parseFloat($("#videoBox").offsetWidth) / 2) + "px";
+            $("#videoBox").style.marginTop = -(parseFloat($("#videoBox").style.height) / 2) + "px";
+            if ($("#videoBox").offsetLeft < 0) { $("#videoBox").style.marginLeft = parseFloat($("#videoBox").style.marginLeft) - $("#videoBox").offsetLeft + "px"; }
+            if ($("#videoBox").offsetTop < 0) { $("#videoBox").style.marginTop = parseFloat($("#videoBox").style.marginTop) - $("#videoBox").offsetTop + "px"; };
+
+            $("#flash,#flash embed").attr("width", $("#MyVideo").css("width"));
+            $("#flash,#flash embed").attr("height", $("#MyVideo").css("height"));
+        }
+
+        //文件浏览；
+        function getFiles(files, open, Isfolder) {
+            var strhtml = "";  var split_path; var equalpath;
+            var filetype = ""; var markSign; var filelistbox = $("#filelistbox");
+            
+            if (Isfolder && files.length > 0)
+                markSign = getObjectURL(files[0]).replace(/\\|\//g, 'a').replace(/\|/g, 'c').replace(/\?/g, 'd').replace(/blob:null/g, 'e');
+            
+            oldlength = myfiles.length;
+            for (var i = 0; i < files.length; i++) {
+                file = files[i];
+                path = file.webkitRelativePath || file.mozFullPath || file.name;
+                if (Checkfile(file)) {
+                    file.url = url;
+                    myfiles.push(file);
+                    split_path = path.split(/[\/|\\]/);
+
+                    if (Isfolder) {
+                        var catalog = path.replace(/[\/|\\]/g, "|"); catalog = markSign + "/" + catalog;
+                        catalog = catalog.substring(0, catalog.lastIndexOf('|'));
+                        equalpath = $("#filelistbox slot[path='" + catalog + "']");
+                        if (equalpath.length > 0) {
+                            strhtml  = "<li style=\"padding-left:15px;\" filetitle='" + split_path[split_path.length - 1] + "' title='加载中……' selected='false' ";
+                            strhtml += "index='" + (myfiles.length - 1) + "'>" + myfiles.length + "、" + split_path[split_path.length - 1] + "</li>";
+                            equalpath[0].innerHTML += strhtml; strhtml = "";
+                        }
+                        else {
+                            var route = catalog + "|"; var prePath = [];
+                            for (var j = 0; j <= split_path.length - 1; j++) {
+                                if (j != split_path.length - 1) {
+                                    catalog = route.substring(0, route.indexOf('|')); catalog = catalog.replace(/\?/g, "|");
+                                    route = route.replace("|", "?");
+
+                                    var Isexist = equalpath = $("#filelistbox slot[path='" + catalog + "']");
+                                    if (Isexist.length > 0)
+                                        prePath = Isexist;
+                                    else if (prePath.length > 0) {
+                                        prePath[0].innerHTML += "<details " + (j == 0 ? "" : "style=\"padding-left:15px;\"") + "><summary>" + split_path[j] + "</summary><slot level=\"" + (j + 1) + "\" path='" + catalog + "'></slot></details>";
+                                        prePath = equalpath = $("#filelistbox slot[path='" + catalog + "']");                                        
+                                    } else {
+                                        strhtml += "<details " + (j == 0 ? "" : "style=\"padding-left:15px;\"") + "><summary>" + split_path[j] + "</summary><slot level=\"" + (j + 1) + "\" path='" + catalog + "'>";
+                                    }
+                                }
+                                else {
+                                    catalog = path.replace(/[\/|\\]/g, "|"); catalog = markSign + "/" + catalog;
+                                    catalog = catalog.substring(0, catalog.lastIndexOf('|'));
+
+                                    equalpath = $("#filelistbox slot[path='" + catalog + "']");
+                                    if (equalpath.length > 0) {
+                                        strhtml = "<li style=\"padding-left:15px;\" filetitle='" + split_path[split_path.length - 1] + "' title='加载中……' selected='false' ";
+                                        strhtml += "index='" + (myfiles.length - 1) + "'>" + myfiles.length + "、" + split_path[split_path.length - 1] + "</li>";
+                                        equalpath[0].innerHTML += strhtml; strhtml = "";
+                                    }
+                                    else {
+                                        strhtml += "<li style=\"padding-left:15px;\" filetitle='" + split_path[split_path.length - 1] + "' title='加载中……' selected='false' ";
+                                        strhtml += "index='" + (myfiles.length - 1) + "'>" + myfiles.length + "、" + split_path[split_path.length - 1] + "</li>";
+                                    }
+                                }
+                            }
+                            if (prePath.length <= 0)
+                                for (var z = 0; z <= split_path.length - 2; z++) { strhtml += "</slot></details>"; }
+                        }                        
+                        filelistbox.innerHTML = filelistbox.innerHTML + strhtml; strhtml = "";
+                    }
+                    else {
+                        strhtml += "<li filetitle='" + split_path[split_path.length - 1] + "' title='加载中……' selected='false' ";
+                        strhtml += "index='" + (myfiles.length - 1) + "'>" + myfiles.length + "、" + split_path[split_path.length - 1] + "</li>";
+                    }
+                }
+            }
+            filelistbox.innerHTML = filelistbox.innerHTML +  strhtml;
+            Bindfile();
+            if (open && (oldlength != myfiles.length)) {
+                oldcurfile = currentfile; currentfile = parseInt(oldlength);
+                Openfile();
+            }
+            console.log(myfiles);
+        }
+        function getObjectURL(file) {
+            if (file.url)
+                url = file.url;
+            else if (window.createObjectURL)
+                url = window.createObjectURL(file);
+            else if (window.createBlobURL)
+                url = window.createBlobURL(file);
+            else if (window.URL && window.URL.createObjectURL)
+                url = window.URL.createObjectURL(file);
+            else if (window.webkitURL && window.webkitURL.createObjectURL)
+                url = window.webkitURL.createObjectURL(file);
+            return url;
+        }
+        function Checkfile(file) {
+            path = file.webkitRelativePath || file.mozFullPath || file.name;
+            url = getObjectURL(file);
+            
+            //空-不支持；maybe-可能支持；probably-确定支持此媒体类型；
+            filetype = path.split('.');
+            filetype = filetype[filetype.length - 1].toLowerCase();
+	        split_path = path.split(/[\/|\\]/);
+	        if (file.type && file.type == "url")
+	            return true;
+	        else if ((url != undefined && split_path[split_path.length - 1] != ".") && (MyVideo.canPlayType("video/" + filetype) || fileTypes["video"].indexOf(filetype) > -1))
+                return true;
+            else
+                return false;
+        }
+        function Bindfile() {
+            files_li = $("#filelistbox li");
+            ResetFileIndex();
+            for (var i = 0; i < files_li.length; i++) {
+                files_li[i].ondblclick = function () {
+                    clearTimeout(clicktime);
+                    oldcurfile = currentfile; currentfile = parseInt(this.getAttribute("index"));
+                    Openfile();
+                }
+                files_li[i].onclick = function () {
+                    clearTimeout(clicktime); var obj = this;
+                    clicktime = setTimeout(function () {
+                        if (obj.getAttribute("selected") == "false") {
+                            obj.style.backgroundColor = "#4083D6";
+                            obj.setAttribute("selected", "true");
+                        } else {
+                            obj.style.backgroundColor = "";
+                            obj.setAttribute("selected", "false");
+                        }
+                        if (keyevent != null && keyevent.shiftKey) {
+                            var prevIndex = -1; var nextIndex = -1; var curIndex = parseInt(obj.getAttribute("index"));
+                            for (var x = 0; x < files_li.length; x++) {
+                                if (files_li[x].getAttribute("selected") == "true") {
+                                    if (curIndex > parseInt(files_li[x].getAttribute("index"))) { prevIndex = parseInt(files_li[x].getAttribute("index")); }
+                                    if (curIndex < parseInt(files_li[x].getAttribute("index"))) { nextIndex = parseInt(files_li[x].getAttribute("index")); break; }
+                                }
+                            }
+                            if (prevIndex >= 0 || nextIndex > 0) {
+                                nextIndex = (parseInt(curIndex - prevIndex) > parseInt(nextIndex - curIndex) || prevIndex < 0) && nextIndex > 0 ? nextIndex : prevIndex;
+                                for (var y = 0; y < files_li.length; y++) {
+                                    prevIndex = parseInt(files_li[y].getAttribute("index"));
+                                    if ((prevIndex >= nextIndex && prevIndex <= curIndex) || (prevIndex >= curIndex && prevIndex <= nextIndex)) {
+                                        files_li[y].style.backgroundColor = "#4083D6";
+                                        files_li[y].setAttribute("selected", "true");
+                                    }
+                                }
+                            }
+                            $(".placeholder")[0].focus(); $(".placeholder")[0].blur();
+                        }
+                        else if (keyevent == null || keyevent.ctrlKey.toString() == "false") {
+                            for (var z = 0; z < files_li.length; z++) {
+                                if (files_li[z].getAttribute("selected") == 'true' && files_li[z].getAttribute("index") != obj.getAttribute("index")) {
+                                    files_li[z].style.backgroundColor = "";
+                                    files_li[z].setAttribute("selected", "false");
+                                }
+                            }
+                        }
+                    }, 200);
+                }
+                files_li[i].onmouseover = function (e) {
+                    file = myfiles[parseInt(this.getAttribute("index"))];
+                    path = file.webkitRelativePath || file.mozFullPath || file.name;
+                    this.setAttribute("title", getfileTitle(file, path));
+                    $poshytip(this, e);
+                }
+                files_li[i].onmouseout = function (e) { $poshytip_destroy(this); }
+            }
+            var details = document.querySelectorAll("#filelistbox details");
+            for (var j = 0; j < details.length; j++) {
+                if (details[j].getElementsByTagName("li").length <= 0)
+                    details[j].parentNode.removeChild(details[j]);
+                else {
+                    details[j].onclick = function () { $(".placeholder")[0].focus(); $(".placeholder")[0].blur(); }
+                }
+            }
+        }
+        function ResetFileIndex() {
+            for (var i = 0; i < files_li.length; i++) {
+                files_li[i].setAttribute("index", i);
+                files_li[i].innerHTML = (i + 1) + "、" + files_li[i].getAttribute("filetitle");
+            }
+        }
+        function getfileTitle(file, n) {
+            var parts = unescape(n).replace(/^.*(music|desktop|document|video|home)/gi, '').replace(/\[[^\]]+\]/g, '')
+                        .replace(/_/g, ' ').replace(/[0-9]+\s*(kbps|\-)/, '').split(/[\/]/).reverse();
+            var name = parts[0].replace(/\.(mp3|ogg|cd|m4a|flac)/, '').replace(/^\s|\s$/g, '').replace(/^\d+\s*/, '');
+            var artist = 'Unknown', album = 'Unknown', genre = 'Unknown', fileSize = "Unknown";
+
+            if (/\-/.test(name)) {
+                var np = name.split('-').reverse();
+                name = np[0];
+                if (np.length >= 2)
+                    artist = np[1];
+                if (np.length >= 3)
+                    artist = np[2];album = np[1];
+                if (parts[1] && parts[2]) {
+                    var album = parts[2].replace(/^\s|\s$/g, '');
+                    if (!album)
+                        album = parts[1].replace(/^\s|\s$/g, '');
+                }
+            } else {
+                if (parts[1])
+                    var album = parts[1].replace(/^\s|\s$/g, '');
+                if (parts[2])
+                    var artist = parts[2].replace(/^\s|\s$/g, '').replace(/^\d+\s*/, '');
+            }
+            if (/\-/.test(album)) {
+                var as = album.split('-');
+                album = as[1];
+                if (!artist)
+                    artist = as[0];
+            }
+            artist = file.Artist || artist;
+            album = file.Album || album;
+            genre = file.Genre || genre;
+            fileSize = file.size || file.fileSize || fileSize;
+            if (fileSize) {
+                if (fileSize < 1024)
+                    fileSize += "B";
+                else if (fileSize < 1024 * 1024)
+                    fileSize = (fileSize / 1024).toFixed(2) + "KB";
+                else if (fileSize < 1024 * 1024 * 1024)
+                    fileSize = (fileSize / (1024 * 1024)).toFixed(2) + "MB";
+		        else if (fileSize < 1024 * 1024 * 1024 * 1024)
+                    fileSize = (fileSize / (1024 * 1024 * 1024)).toFixed(2) + "GB";
+            }
+            var lastModifiedDate = file.lastModifiedDate ? file.lastModifiedDate.toLocaleString() : file.lastModified ? file.lastModified.toLocaleString() : "";
+
+            var filetype = n.split('.');
+            filetype = filetype.length > 0 ? filetype[filetype.length - 1].toLowerCase() : "Unknown";
+            var split_path = n.split(/[\/|\\]/);
+            if (fileTypes["music"].indexOf(filetype) > -1)
+                return Marks[pagelangtype]["title"]  + name   + "<br>" +
+                       Marks[pagelangtype]["artist"] + artist + "&nbsp;&nbsp;&nbsp;&nbsp;" + Marks[pagelangtype]["album"] + album + "<br/>" +
+                       Marks[pagelangtype]["genre"]  + genre  + "&nbsp;&nbsp;&nbsp;&nbsp;" + Marks[pagelangtype]["fileSize"] + fileSize;
+            else
+                return Marks[pagelangtype]["fileName"] + split_path[split_path.length - 1] + "<br>" +
+                       Marks[pagelangtype]["fileType"] + filetype.toUpperCase() + "&nbsp;&nbsp;&nbsp;&nbsp;" + Marks[pagelangtype]["fileSize"] + fileSize + "<br/>" + 
+                       Marks[pagelangtype]["lastModifiedDate"] + lastModifiedDate;
+        }
+        //清除、显隐列表、搜索
+        function clearFiles(all) {
+            files_li = document.querySelectorAll("#filelistbox li");
+            var count = 0;
+            for (var i = 0; i < files_li.length; i++) {
+                if (files_li[i].getAttribute("selected") == 'true' && all == false) {
+                    files_li[i].parentNode.removeChild(files_li[i]);
+                    files_li = document.querySelectorAll("#filelistbox li");
+                    myfiles.splice(i, 1);
+
+                    if (i == currentfile) { currentfile = -1; oldcurfile = currentfile; }
+                    else if (i < currentfile) { currentfile--; oldcurfile = currentfile; }
+                    count++; i--;
+                }
+            }
+            if (count == 0 || all == true) {
+                myfiles = [];
+                currentfile = -1; oldcurfile = -1;
+                $("#filelistbox").html("");
+            }
+            Bindfile();
+        }
+        function Movefiles(upmove) {
+            var movefile; var moveli;
+            files_li = document.querySelectorAll("#filelistbox li");
+            for (var i = -1; i < files_li.length; i++) {
+                if (!upmove && i == -1) { i = files_li.length - 2; } else if (upmove && i == -1) { i = 0; } 
+                if (files_li[i].getAttribute("selected") == 'true' && ((i > 0 && upmove) || (i < files_li.length - 1 && !upmove))) {
+                    movefile = myfiles[i];
+                    myfiles[i] = upmove ? myfiles[i - 1] : myfiles[i + 1];
+                    upmove ? myfiles[i - 1] = movefile : myfiles[i + 1] = movefile;
+
+                    moveli = files_li[i].cloneNode(true);               
+                    movefile = upmove ? files_li[i - 1].cloneNode(true) : files_li[i + 1].cloneNode(true);
+                    if (parseInt(files_li[i].getAttribute("index")) == currentfile)
+                        upmove ? currentfile-- : currentfile++;
+                    else if (parseInt(movefile.getAttribute("index")) == currentfile)
+                        upmove ? currentfile++ : currentfile--;
+
+                    files_li[i].parentNode.replaceChild(movefile, files_li[i]);
+                    if (upmove) { files_li[i - 1].parentNode.replaceChild(moveli, files_li[i - 1]); }
+                    else { files_li[i + 1].parentNode.replaceChild(moveli, files_li[i + 1]); }
+                    files_li = document.querySelectorAll("#filelistbox li");
+                    ResetFileIndex();
+                }
+                if (!upmove) {i = (i == 0 ? files_li.length : i - 2); } 
+            }
+            oldcurfile = currentfile;
+            Bindfile();
+        }
+        function showFiles() {
+            if (filesbox.className == "hide")
+                filesbox.className = "show";
+            else
+                filesbox.className = "hide";
+        }
+        function Search(keyname) {
+            files_li = $("#filelistbox li");
+            keyname.trim().length > 0 ? $(".placeholder").css("font-style", "inherit") : $(".placeholder").css("font-style", "italic");
+
+            for (var i = 0; i < files_li.length; i++) {
+                if (files_li[i].getAttribute("filetitle").toLowerCase().indexOf(keyname.toLowerCase().trim()) > -1)
+                    files_li[i].className = "show poshytip";
+                else
+                    files_li[i].className = "hide poshytip";
+            }
+            var summarys = $("#filelistbox summary");
+            for (var i = 0; i < summarys.length; i++) {
+                if (summarys[i].innerHTML.toLowerCase().indexOf(keyname.toLowerCase().trim()) > -1)
+                    $(summarys[i].parentNode).find("li").attr("class", "show");
+            }
+            var details = $("#filelistbox details");
+            for (var j = 0; j < details.length; j++) {
+                if ($(details[j]).find("li.show").length > 0)
+                    details[j].style.display = "block";
+                else
+                    details[j].style.display = "none";
+            }
+        }
+
+        //拖动|粘贴；
+        window.ondragover = function (e) { e.stopPropagation(); if (e && e.preventDefault) { e.preventDefault(); } else { window.event.returnValue = false; } return false; }
+        window.ondrop = function (e) {
+            e.stopPropagation();
+            loadCheck(e.dataTransfer.files, "poster");
+            loadCheck(e.dataTransfer.files, "subtitle");
+            getFiles(e.dataTransfer.files, true, false);
+            loadCheck(e.dataTransfer.files, "flash");
+            fileName.value = null;
+            if (e && e.preventDefault) { e.preventDefault(); } else { window.event.returnValue = false; }
+            return false;
+        }
+        document.body.onpaste = function (event) {
+            var cbd = event.clipboardData || event.originalEvent.clipboardData ||
+                      window.clipboardData || window.getBrowserEvent().clipboardData || window.DataTransfer;
+            var pastefiles = [];
+            if (cbd.items.length > 0 && cbd.items[0].kind == "string") {
+                for (var i = 0; i < cbd.items.length; i++) { }
+                var urlfile = new Object();
+                urlfile.url = cbd.getData('Text');
+                urlfile.name = cbd.getData('Text');
+                urlfile.type = "url";
+                pastefiles.push(urlfile);
+            }
+            else {
+                pastefiles.push(cbd.getAsFile() || cbd.getData('file') || cbd.files);
+            }
+            loadCheck(pastefiles, "flash");
+            getFiles(pastefiles, true, false);
+            loadCheck(pastefiles, "poster");
+            loadCheck(pastefiles, "subtitle");
+            
+            fileName.value = null;
+        }
+        
+        var Marks = "";
+        function loadlangMarks() {
+            Marks = {
+                'zh-CH': {
+                    pagetitle: "墨☆尘的播放器",
+                    /*自定义菜单*/
+                    play: "播放", pause: "暂停", stop: "停止", backRate: "重播", progress: "进度条",
+                    ff5: "快进5秒", rew5: "快退5秒", ff10: "快进10秒", rew10: "快退10秒", ff15: "快进15秒", rew15: "快退15秒", 
+                    speed: "加速3倍", slower: "减速3倍", normal: "正常倍速", stepBack: "回放", prev: "上一篇", next: "下一篇",
+                    volume: "音量", mute: "静音", cancelVolume: "取消静音", riseVolume: "加大音量", dropVolume: "减小音量",
+                    load: "载入|下载", language:"语言",
+                    subtitlelang: "字幕语言(shift+Y)", zhSub: "中文字幕", jpSub: "日文字幕", enSub: "英文字幕", pagelang: "页面语言(shift+P)",
+                    subtitle: "载入字幕/歌词", poster: "载入海报/写真", flash: "载入插件",
+                    downSubtitle: "下载【字幕/歌词】", downPoster: "下载【海报/写真】", downFile: "下载【视频/歌曲】", downPage: "下载【播放器】",
+                    fullScreen: "全屏", setCenter: "设置中心", engine: "播放引擎",
+                    localstorage: "本地存储", urlfile: "网络文件", localfile: "本地文件", player: "播放器设置", clearstorage: "清除本地缓存",
+                    openfile: "打开文件", openfiles: "打开文件夹", openurl: "打开URL", addfile: "添加文件", addfiles: "添加文件夹", addurl: "添加URL", playlist: "播放列表", 
+                    playtype: "播放模式(alt+S)", ptOne: "单次播放", ptAgain: "重复播放", ptOrder: "顺序播放", ptSelect: "选中播放", ptRandom: "随机播放", ptLoops: "循环播放",
+                    clearfile: "清除文件", clearlist: "清空列表", movefileup: "文件上移", movefiledown: "文件下移",
+                    /*系统菜单*/
+                    menu_stop: "停止(End)", menu_backRate: "重播(Home)", menu_progress: "进度条(shift+C)",
+                    menu_ff5: "快进5秒", menu_rew5: "快退5秒", menu_ff10: "快进10秒", menu_rew10: "快退10秒", menu_ff15: "快进15秒", menu_rew15: "快退15秒",
+                    menu_speed: "加速3倍(ctrl+→)", menu_slower: "减速3倍(ctrl+↓)", menu_normal: "正常倍速(ctrl+↑)", menu_stepBack: "回放(ctrl+←)",
+                    menu_prev: "上一篇(PageUp)", menu_next: "下一篇(PageDown)",
+                    menu_mute: "静音(alt+M)", menu_cancelVolume: "取消静音(alt+M)", menu_riseVolume: "加大音量(↑)", menu_dropVolume: "减小音量(↓)",
+                    menu_fullScreen: "切换全屏(Enter)", menu_setCenter: "设置中心(shift+S)", menu_engine: "播放引擎(shift+F)",
+                    menu_openurl: "打开URL(shift+U)", menu_addurl: "添加URL(alt+U)", menu_playlist: "播放列表(shift+L)",
+                    menu_clearfile: "清除文件(Delete)", menu_clearlist: "清空列表(alt+Del)", menu_movefileup: "文件上移(alt+↑)", menu_movefiledown: "文件下移(alt+↓)",
+                    /*设置中心*/
+                    set: "设置", close: "关闭", copyright: "©mokingbril 版权所有",
+                    screenRatio: "屏幕比例：", screenWidth: "调屏宽条：", screenHeight: "调屏高条：",
+                    colorBoard: "调 色 板：", pagebg: "页面背景", playerbg: "播放器背景", interfacebg: "界面背景",
+                    showOrhide: "显/隐  键：", ck_speed: "加速", ck_filename: "片名", ck_toolbar: "工具", ck_lock: "锁定",
+                    /*浏览列表*/
+                    search: " 搜 索 ", add: "添加", clear: "清除", up: "上移", down: "下移",
+                    /*系统消息*/
+                    loadData_error: "载入失败！请检查文件数据是否有效！", loadFlash_error: "载入失败！请检查插件是否有效！",
+                    promptUrl: "请输入URL", promptPath: "请输入源文件夹上级路径", playOver: "播放结束！", pageleaveMes: "确定离开此页吗？【墨☆尘的播放器】", setSuccess: "执行成功！",
+                    progress_error_0: "元素处于初始状态", progress_error_1: "已选择编码格式，网络未连接！", loading: "加载中…", load_error: "加载失败！",
+                    error_1: "视频的下载过程被中止。", error_2: "网络发生故障，视频的下载过程被中止。", error_3: "解码失败！", error_4: "不支持播放的视频格式！",
+                    fileName: "文件名：", fileType: "文件类型：", fileSize: "文件大小：", lastModifiedDate: "修改日期：", title: "标题：", artist: "艺术家：", album: "唱片集：", genre: "流派：",
+                    /*提示框*/
+                    sysMessage : "温馨提示", sure : "确定"
+                },
+                'jp-JA': {
+                    pagetitle: "mokingbrilの専属プレーヤー",
+                    /*カスタマイズメニュー*/
+                    play: "放送", pause: "一時休止", stop: "スクラム", backRate: "再放送",progress: "進度條",
+                    ff5: "早送り5秒", rew5: "5秒早く退", ff10: "早送り10秒", rew10: "10秒早く退", ff15: "早送り15秒", rew15: "15秒早く退", 
+                    speed: "3倍速める", slower: "3倍减速", normal: "正常だ倍速", stepBack: "回放送", prev: "上一篇", next: "下一篇",
+                    volume: "ボリユーム", mute: "マナーモード", cancelVolume: "取り消し静粛", riseVolume: "アップ音量", dropVolume: "下げ音量",
+                    load: "挿し込む|ダウンロード", language: "言葉",
+                    subtitlelang: "字幕言語(shift+Y)", zhSub: "漢文字幕", jpSub: "日本語字幕", enSub: "英語字幕", pagelang: "ページの言叶(shift+P)",
+                    subtitle: "挿入字幕/歌詞", poster: "挿入ポスター", flash: "挿入プラグイン",
+                    downSubtitle: "ダウンロード【字幕/歌詞】", downPoster: "ダウンロード【ポスター】", downFile: "ダウンロード【動畫】", downPage: "ダウンロード【プレーヤー】",
+                    fullScreen: "全画面", setCenter: "センターを設置", engine: "エンジン",
+                    localstorage: "本地メモリー", urlfile: "迴路網しょゐい", localfile: "當地しょゐい", player: "プレーヤーを設置", clearstorage: "緩存を清掃",
+                    openfile: "しょゐいを開く", openfiles: "フォルダを開く", openurl: "URLを開く", addfile: "しょゐいを添付", addfiles: "フォルダを添付", addurl: "URLを添付",
+                    playlist: "プレイリスト", playtype: "放送モード(alt+S)",
+                    ptOne: "単回放送", ptAgain: "重複放送", ptOrder: "连続放送", ptSelect: "優先放送", ptRandom: "ランダム放送", ptLoops: "循環放送",
+                    clearfile: "しょゐいを清掃", clearlist: "青空リスト", movefileup: "しょゐいを上昇", movefiledown: "しょゐい下がっ",
+                    /*システムメニュー*/
+                    menu_stop: "やむ(End)", menu_backRate: "再放送(Home)", menu_progress: "進度條(shift+C)",
+                    menu_ff5: "早送り5秒", menu_rew5: "5秒早く退", menu_ff10: "早送り10秒(→)", menu_rew10: "10秒早く退(←)", menu_ff15: "早送り15秒", menu_rew15: "15秒早く退",
+                    menu_speed: "3倍加速(ctrl+→)", menu_slower: "3倍减速(ctrl+↓)", menu_normal: "正常だ倍速(ctrl+↑)", menu_stepBack: "回放送(ctrl+←)",
+                    menu_prev: "上一篇(PageUp)", menu_next: "下一篇(PageDown)",
+                    menu_mute: "静粛(alt+M)", menu_cancelVolume: "取り消し静粛(alt+M)", menu_riseVolume: "アップ音量(↑)", menu_dropVolume: "下げ音量(↓)",
+                    menu_fullScreen: "全画面(Enter)", menu_setCenter: "センターを設置(shift+S)", menu_engine: "エンジン(shift+F)",
+                    menu_openurl: "URLを開く(shift+U)", menu_addurl: "URLを添付(alt+U)", menu_playlist: "プレイリスト(shift+L)",
+                    menu_clearfile: "ファイルを清掃(Delete)", menu_clearlist: "青空リスト(alt+Del)", menu_movefileup: "ファイルを上昇(alt+↑)", menu_movefiledown: "ファイル下がっ(alt+↓)",
+                    /*センターを設置*/
+                    set: "設ける", close: "閉じる", copyright: "©mokingbril 版権所有",
+                    screenRatio: "スクリーンの比例：", screenWidth: "画面の横条調：", screenHeight: "調パネル高条：",
+                    colorBoard: "パレット：", pagebg: "ページを背景", playerbg: "プレーヤーの背景", interfacebg: "インタフェースの背景",
+                    showOrhide: "顕/隠かぎ：", ck_speed: "速める", ck_filename: "タイトル", ck_toolbar: "道具", ck_lock: "ロックオン",
+                    /*プレイリスト*/
+                    search: " 検 索 ", add: "てんか", clear: "清掃", up: "上昇", down: "下がって",
+                    /*システムのニュース*/
+                    loadData_error: "失败を挿入！请検査データのファイルの効果があるかどうか！", loadFlash_error: "失败を挿入！かどうかをチェックしてくださいアド有効だ！",
+                    promptUrl: "URLを入力してください", promptPath: "入力してください。源フォルダ上級経路", playOver: "放映终了！",
+                    pageleaveMes: "このページを離れ確定か？【きちゃんの専属プレーヤー】", setSuccess: "執行の成功！",
+                    progress_error_0: "元素が初期の状态だ", progress_error_1: "すでに選択コーディング形式，インターネット接続なかっ！", loading: "积载で…", load_error: "积载失敗！",
+                    error_1: "動画のダウンロード過程が中止された。", error_2: "インターネット故障，動画のダウンロード過程が中止された。", error_3: "復号化失敗！", error_4: "不支持の動画再生フォーマット！",
+                    fileName: "ファイル名：", fileType: "ファイルタイプ：", fileSize: "ファイルの大きさ：",lastModifiedDate: "改正日程：", title: "タイトル：", artist: "芸术家：", album: "アルバム：", genre: "ジャンル：",
+                    /*ゆうじょうていじ*/
+                    sysMessage: "暖かい提示", sure: "する"
+                },
+                'en-EN': {
+                    pagetitle: "mokingbril's Exclusive Player",
+                    /*CustomizeMenus*/
+                    play: "Play", pause: "Pause", stop: "Stop", backRate: "Replay",progress: "ProgressBar",
+                    ff5: "FastForward 5s", rew5: "RetreatQuickly 5s", ff10: "FastForward 10s", rew10: "RetreatQuickly 10s", ff15: "FastForward 15s", rew15: "RetreatQuickly 15s",
+                    speed: "Speed 3Time", slower: "Slower 3Time", normal: "NormalSpeed", stepBack: "Playback", prev: "Previous", next: "Next",
+                    volume: "Volume", mute: "Mute", cancelVolume: "CancelMute", riseVolume: "RiseVolume", dropVolume: "ReduceVolume",
+                    load: "LoadingOrDownLoad", language: "Language",
+                    subtitlelang: "SubtitleLanguage(shift+Y)", zhSub: "ChineseSubtitle", jpSub: "JapaneseSubtitle", enSub: "EnglishSubtitle", pagelang: "PageLanguage(shift+P)",
+                    subtitle: "LoadSubtitle", poster: "LoadPoster", flash: "LoadFlash",
+                    downSubtitle: "DownLoadSubtitle", downPoster: "DownLoadPoster", downFile: "DownLoadFile", downPage: "DownLoadPlayer",
+                    fullScreen: "FullScreen", setCenter: "SetCenter", engine: "Engine",
+                    localstorage: "LocalStorage", urlfile: "NetFile", localfile: "LocalFile", player: "PlayerSet", clearstorage: "ClearStorage",
+                    openfile: "OpenFile", openfiles: "OpenFolder", openurl: "OpenURL", addfile: "AddFile", addfiles: "AddFolder", addurl: "AddURL", playlist: "Playlist",
+                    playtype: "PlayMode(alt+S)", ptOne: "OnePlay", ptAgain: "AgainPlay", ptOrder: "OrderPlay", ptSelect: "SelectPlay", ptRandom: "RandomPlay", ptLoops: "LoopPlay",
+                    clearfile: "ClearFile", clearlist: "ClearList", movefileup: "MoveUp", movefiledown: "MoveDown",
+                    /*SystemMenu*/
+                    menu_stop: "Stop(End)", menu_backRate: "Replay(Home)", menu_progress: "ProgressBar(shift+C)",
+                    menu_ff5: "FastForward 5s", menu_rew5: "RetreatQuickly 5s", menu_ff10: "FastForward 10s(→)", menu_rew10: "RetreatQuickly 10s(←)", menu_ff15: "FastForward 15s", menu_rew15: "RetreatQuickly 15s",
+                    menu_speed: "Speed(ctrl+→)", menu_slower: "Slower(ctrl+↓)", menu_normal: "NormalSpeed(ctrl+↑)", menu_stepBack: "Playback(ctrl+←)",
+                    menu_prev: "Previous(PageUp)", menu_next: "Slower(PageDown)",
+                    menu_mute: "Mute(alt+M)", menu_cancelVolume: "CancelMute(alt+M)", menu_riseVolume: "RiseVolume(↑)", menu_dropVolume: "ReduceVolume(↓)",
+                    menu_fullScreen: "FullScreen(Enter)", menu_setCenter: "SetCenter(shift+S)", menu_engine: "Engine(shift+F)",
+                    menu_openurl: "OpenURL(shift+U)", menu_addurl: "AddURL(alt+U)", menu_playlist: "Playlist(shift+L)",
+                    menu_clearfile: "ClearFile(Delete)", menu_clearlist: "ClearList(alt+Del)", menu_movefileup: "MoveUp(alt+↑)", menu_movefiledown: "MoveDown(alt+↓)",
+                    /*SetCenter*/
+                    set: "SetCenter", close: "Close", copyright: "©2021 By mokingbril",
+                    screenRatio: "ScreenRatio:", screenWidth: "ScreenWidth:", screenHeight: "ScreenHeight:",
+                    colorBoard: "ColorBoard:", pagebg: "PageBackground", playerbg: "PlayerBackground", interfacebg: "InterfaceBackground",
+                    showOrhide: "ShowOrHide:", ck_speed: "Speed", ck_filename: "FileName", ck_toolbar: "Toolbar", ck_lock: "Lock",
+                    /*PlayList*/
+                    search: " Search ", add: "Add", clear: "Clear", up: "MoveUp", down: "MoveDown",
+                    /*SystemMessage*/
+                    loadData_error: "Load the failure！Please check the file data is valid！", loadFlash_error: "Load the failure！Please check the plugin is valid！",
+                    promptUrl: "Please enter the url", promptPath: "Please enter the source folder superior path", playOver: "End of the play！", pageleaveMes: "Sure you leave this page?[mokingbril's Player]", setSuccess: "Executed successfully!",
+                    progress_error_0: "Elements in the initial state", progress_error_1: "The selected encoding format，Network is not connected！", loading: "Loading…", load_error: "Fails to load！",
+                    error_1: "Video download process is aborted。", error_2: "The network breakdown，Video download process is aborted。", error_3: "Decoding failure！", error_4: "Does not support play video formats！",
+                    fileName: "FILENMAE：", fileType: "FILETYPE：", fileSize: "FILESIZE：", lastModifiedDate: "LASTMODIFIEDDATE：", title: "TITLE：", artist: "ARTIST：", album: "ALBUM：", genre: "GENRE：",
+                    /*PromptBox*/
+                    sysMessage: "Kindly Reminder", sure: "SURE"
+                }
+            }
+        }
+        //页面语言-切换；
+        function switchPageLang(langtype) {
+            langtype = langtype || 'zh-CH';
+            if (langtype=="auto") {
+                langtype = pagelangtype;
+                switch (langtype) {
+                    case "zh-CH": langtype = "jp-JA"; break;
+                    case "jp-JA": langtype = "en-EN"; break;
+                    case "en-EN": langtype = "zh-CH"; break;
+                    default: langtype = 'zh-CH'; break;
+                }
+            }
+            var labels = document.querySelectorAll(".label");
+            for (i = 0; i < labels.length; i++) {
+                labels[i].innerHTML = Marks[langtype][labels[i].getAttribute("lang")]; }
+            var titles = document.querySelectorAll(".mytitle");
+            for (i = 0; i < titles.length; i++) {
+                titles[i].setAttribute("title", Marks[langtype][titles[i].getAttribute("lang")]); }
+            var menus = document.querySelectorAll(".menu");
+            for (i = 0; i < menus.length; i++) {
+                menus[i].setAttribute("label", Marks[langtype][menus[i].getAttribute("lang")]); }
+
+            $(".placeholder")[0].setAttribute("placeholder", Marks[langtype][$(".placeholder")[0].getAttribute("lang")]);
+            $("#videoFileName").innerHTML == Marks[pagelangtype]["pagetitle"] ? $("#videoFileName").html(Marks[langtype]["pagetitle"]) : "";
+
+            //例行-变更语言；
+            pagelangtype = langtype;
+            switchLang($("#subtitlelang .subtitled")[0].getAttribute("type"));
+            ResetFForRew(kktime);
+            setPlaytype(false);
+
+            //切换语言
+            $("#pagelang li").attr("class", "");
+            $("#pagelang li[type='" + langtype + "']").attr("class", "subtitled");
+            if ($("#pagelangs menuitem[label*='√']").length == 1)
+                $("#pagelangs menuitem[label*='√']").attr("label", $("#pagelangs menuitem[label*='√']").attr("label").replace('√', ''));
+            $("#pagelangs menuitem[type='" + langtype + "']").attr("label", $("#pagelangs menuitem[type='" + langtype + "']").attr("label") + "√");
+        }
+        //本地存储；
+        localStoragefiles("read");
+        function localStoragefiles(type) {
+            lastplaytimes(currentfile);
+            if (type == "localfile" && window.localStorage) {
+                var folderpath = prompt(Marks[pagelangtype]["promptPath"], "");
+                if (folderpath == undefined || folderpath == null || folderpath.trim() == "")
+                    return false;
+                var localfiles = []; var countNum = 0;
+                files_li = $("#filelistbox li");
+                for (var i = 0; i < files_li.length; i++) {
+                    if (files_li[i].getAttribute("selected") == 'true' && myfiles[i].type != "url") {
+                        file = myfiles[i];
+                        var localfile = new Object();
+                        localfile.name = file.webkitRelativePath || file.mozFullPath || file.name;
+                        localfile.url = "file:/" + "//" + folderpath.trim() + "\\" + localfile.name;
+                        localfile.lastModifiedDate = file.lastModifiedDate;
+                        localfile.lastplaytime = file.lastplaytime || 0;
+                        localfile.type = file.type; localfile.size = file.size;
+                        localfiles.push(localfile);
+                        countNum++;
+                    }
+                }
+                if (countNum == 0) {
+                    localfiles = [];
+                    for (var j = 0; j < myfiles.length; j++) {
+                        if (myfiles[j].type != "url") {
+                            file = myfiles[j];
+                            var localfile = new Object();
+                            localfile.name = file.webkitRelativePath || file.mozFullPath || file.name;
+                            localfile.url = "file:/" + "//" + folderpath.trim() + "\\" + localfile.name;
+                            localfile.lastModifiedDate = file.lastModifiedDate;
+                            localfile.lastplaytime = file.lastplaytime || 0;
+                            localfile.type = file.type; localfile.size = file.size;
+                            localfiles.push(localfile);
+                        }
+                    }
+                }
+                localStorage.filelist = JSON.stringify(localfiles);
+                localStorage.removeItem("filelist");
+                localStorage.setItem("filelist", JSON.stringify(localfiles));
+            }
+            else if (type == "urlfile" && window.localStorage) {
+                var urlfiles = [];
+                for (var i = 0; i < myfiles.length; i++) {if (myfiles[i].type == "url") urlfiles.push(myfiles[i]);}
+                localStorage.urlfiles = JSON.stringify(urlfiles);
+                localStorage.removeItem("urlfiles");
+                localStorage.setItem("urlfiles", JSON.stringify(urlfiles));
+            }
+            else if (type == "read") {                
+                if (window.sessionStorage || window.localStorage) {
+                    try{ JSON.parse(sessionStorage.getItem("myMarks")) ? Marks = JSON.parse(sessionStorage.getItem("myMarks")) : loadlangMarks();}
+                    catch (e) { loadlangMarks(); } //翻译字典
+                    try {
+                        if (JSON.parse(localStorage.getItem("playerStorage"))) {
+                            var myplayer = JSON.parse(localStorage.getItem("playerStorage"));
+                            switchPageLang(myplayer.pagelang); //页面语言
+                            playtypeed = myplayer.playtype; setPlaytype(false); //播放模式
+                            rangeChange("width", myplayer.playerWidth);   //调宽|高条
+                            rangeChange("height", myplayer.playerHeight); adjustSrceen();
+                            myplayer.locked ? ck_Lock.click() : ""; //锁定；
+                            video.volume = myplayer.volume; //音量
+                            switchColor("all_bg", myplayer.all_bg); //背景颜色
+                            switchColor("body_bg", myplayer.body_bg); 
+                            switchColor("video_bg", myplayer.video_bg);
+                            ResetFForRew(myplayer.krtime); //快进
+                        }
+                        if (JSON.parse(localStorage.getItem("urlfiles")))
+                            getFiles(JSON.parse(localStorage.getItem("urlfiles")), opened, false);
+                        if (JSON.parse(localStorage.getItem("filelist")))
+                            getFiles(JSON.parse(localStorage.getItem("filelist")), false, true);
+                    } catch (e) {}
+                }
+            }
+            else if (type == "clear") {
+                sessionStorage.removeItem("myMarks");
+                sessionStorage.clear();
+                localStorage.removeItem("playerStorage");
+                localStorage.removeItem("urlfiles");
+                localStorage.removeItem("filelist");
+                localStorage.clear();
+            }
+            else if (type=="player") {
+                if (window.localStorage || window.sessionStorage) {
+                    var playerStorage = new Object();
+                    playerStorage.volume = video.muted ? 0 : video.volume;//音量
+                    playerStorage.pagelang = pagelangtype; //页面语言
+                    playerStorage.playtype = playtypeed; //播放模式
+                    playerStorage.playerWidth = $("#rangeBox").value; //调宽|高条
+                    playerStorage.playerHeight = $("#rangeBox2").value; 
+                    playerStorage.locked = locked;//锁定
+                    playerStorage.body_bg = $("#colors input")[0].getAttribute("value");//背景颜色
+                    playerStorage.video_bg = $("#colors input")[1].getAttribute("value");
+                    playerStorage.all_bg = $("#colors input")[2].getAttribute("value");
+                    playerStorage.krtime = kktime;//快进时间
+
+                    localStorage.playerStorage = JSON.stringify(playerStorage);
+                    localStorage.removeItem("playerStorage");
+                    localStorage.setItem("playerStorage", JSON.stringify(playerStorage));
+                    
+                    sessionStorage.removeItem("myMarks");
+                    sessionStorage.setItem("myMarks",JSON.stringify(Marks));//翻译字典
+                }
+            }
+            if (type != "read") { showMessage(Marks[pagelangtype]["setSuccess"]); }
+        }
+        //【页面关闭|刷新】
+        pageCloseOrRefresh();
+        function pageCloseOrRefresh() {            
+            try {
+                if (window.attachEvent)
+                    window.attachEvent('onbeforeunload', function (e) { (e || window.event).returnValue = Marks[pagelangtype]["pageleaveMes"]; return Marks[pagelangtype]["pageleaveMes"]; });
+                else {
+                    window.addEventListener('beforeunload', function (e) {
+                        lastplaytimes(currentfile);
+                        var leaveMessage = Marks[pagelangtype]["pageleaveMes"] ? Marks[pagelangtype]["pageleaveMes"] : "确定离开此页吗？【墨☆尘的播放器】";
+                        (e || window.event).returnValue = leaveMessage;
+                        return leaveMessage;
+                    });
+                }
+            } catch (e) { }
+        }
+        ChangeScreen();
+        if ($("#videoBox").offsetWidth > parseFloat(document.body.clientWidth) || $("#videoBox").offsetHeight > parseFloat(HtmlHeight)) { Setscreen("8:16") };
+    </script>
+</body>
+</html>
