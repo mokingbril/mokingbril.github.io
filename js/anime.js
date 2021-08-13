@@ -75,3 +75,12 @@ $(function () {
         $("#page .tag-cloud-list.is-center").append(tag_a_html);
     }
 });
+
+/* 切换音乐频道 */
+function switchMusic(playlistid, play_server) {
+    window.aplayers[0].destroy();
+    $(".aplayer").attr("class","aplayer no-destroy").attr("data-id", playlistid);
+    /* 音乐平台：netease，tencent，kugou，xiami，baidu */
+    if (play_server) { $(".aplayer").attr("data-server", play_server); }
+    aplayers = [];  loadMeting();
+}
