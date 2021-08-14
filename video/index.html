@@ -2035,7 +2035,7 @@
                     details[j].style.display = "none";
             }
         }
-        var filesAndDirs = [];
+        var filesAndDirs = []; var directoryReader;
         function getFileFromEntryRecursively(entry) {
             if (entry.isFile) {
                 entry.file(function (file) {
@@ -2043,8 +2043,13 @@
                     filesAndDirs.push(file);
                 });
             } else {
-                entry.createReader().readEntries(function (entries) { for (var i = 0; i < entries.length; i++) { getFileFromEntryRecursively(entries[i]); } });
+                directoryReader = entry.createReader();
+                directoryReader.readEntries(fnReadEntries);
             }
+        }
+        function fnReadEntries(entries) {
+            for (var i = 0; i < entries.length; i++) { getFileFromEntryRecursively(entries[i]); }
+            if (entries.length > 0) { directoryReader.readEntries(fnReadEntries); }
         }
 
         //拖动|粘贴；
