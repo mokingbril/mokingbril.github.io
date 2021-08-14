@@ -77,10 +77,13 @@ $(function () {
 });
 
 /* 切换音乐频道 */
-function switchMusic(playlistid, play_server) {
-    window.aplayers[0].destroy();
+function switchMusic(playlistid, play_type, play_server) {
+    try { window.aplayers[0].destroy(); } catch (e){ }
+    if (!playlistid && !play_type && !play_server) { playlistid = "3082704644"; }
     $(".aplayer").attr("class","aplayer no-destroy").attr("data-id", playlistid);
-    /* 音乐平台：netease，tencent，kugou，xiami，baidu */
+    /* 频道类型：playlist歌单，song单曲，album专辑，search关键词，artist歌手 */
+    if (play_type) { $(".aplayer").attr("data-type", play_type); }
+    /* 音乐平台：netease网易，tencent腾讯，kugou酷狗，xiami虾米，baidu百度 */
     if (play_server) { $(".aplayer").attr("data-server", play_server); }
     aplayers = [];  loadMeting();
 }
