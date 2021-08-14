@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -1740,7 +1740,7 @@
                     if (Isfolder) {
                         var catalog = path.replace(/[\/|\\]/g, "|"); catalog = markSign + "/" + catalog;
                         catalog = catalog.substring(0, catalog.lastIndexOf('|'));
-                        equalpath = $("#filelistbox slot[path='" + catalog + "']");
+                        equalpath = $("#filelistbox sloot[path='" + catalog + "']");
                         if (equalpath.length > 0) {
                             strhtml  = "<li style=\"padding-left:15px;\" filetitle='" + split_path[split_path.length - 1] + "' title='加载中……' selected='false' ";
                             strhtml += "index='" + (myfiles.length - 1) + "'>" + myfiles.length + "、" + split_path[split_path.length - 1] + "</li>";
@@ -1753,21 +1753,21 @@
                                     catalog = route.substring(0, route.indexOf('|')); catalog = catalog.replace(/\?/g, "|");
                                     route = route.replace("|", "?");
 
-                                    var Isexist = equalpath = $("#filelistbox slot[path='" + catalog + "']");
+                                    var Isexist = equalpath = $("#filelistbox sloot[path='" + catalog + "']");
                                     if (Isexist.length > 0)
                                         prePath = Isexist;
                                     else if (prePath.length > 0) {
-                                        prePath[0].innerHTML += "<details " + (j == 0 ? "" : "style=\"padding-left:15px;\"") + "><summary>" + split_path[j] + "</summary><slot level=\"" + (j + 1) + "\" path='" + catalog + "'></slot></details>";
-                                        prePath = equalpath = $("#filelistbox slot[path='" + catalog + "']");                                        
+                                        prePath[0].innerHTML += "<details " + (j == 0 ? "" : "style=\"padding-left:15px;\"") + "><summary>" + split_path[j] + "</summary><sloot level=\"" + (j + 1) + "\" path='" + catalog + "'></sloot></details>";
+                                        prePath = equalpath = $("#filelistbox sloot[path='" + catalog + "']");                                        
                                     } else {
-                                        strhtml += "<details " + (j == 0 ? "" : "style=\"padding-left:15px;\"") + "><summary>" + split_path[j] + "</summary><slot level=\"" + (j + 1) + "\" path='" + catalog + "'>";
+                                        strhtml += "<details " + (j == 0 ? "" : "style=\"padding-left:15px;\"") + "><summary>" + split_path[j] + "</summary><sloot level=\"" + (j + 1) + "\" path='" + catalog + "'>";
                                     }
                                 }
                                 else {
                                     catalog = path.replace(/[\/|\\]/g, "|"); catalog = markSign + "/" + catalog;
                                     catalog = catalog.substring(0, catalog.lastIndexOf('|'));
 
-                                    equalpath = $("#filelistbox slot[path='" + catalog + "']");
+                                    equalpath = $("#filelistbox sloot[path='" + catalog + "']");
                                     if (equalpath.length > 0) {
                                         strhtml = "<li style=\"padding-left:15px;\" filetitle='" + split_path[split_path.length - 1] + "' title='加载中……' selected='false' ";
                                         strhtml += "index='" + (myfiles.length - 1) + "'>" + myfiles.length + "、" + split_path[split_path.length - 1] + "</li>";
@@ -1780,7 +1780,7 @@
                                 }
                             }
                             if (prePath.length <= 0)
-                                for (var z = 0; z <= split_path.length - 2; z++) { strhtml += "</slot></details>"; }
+                                for (var z = 0; z <= split_path.length - 2; z++) { strhtml += "</sloot></details>"; }
                         }                        
                         filelistbox.innerHTML = filelistbox.innerHTML + strhtml; strhtml = "";
                     }
@@ -2035,16 +2035,45 @@
                     details[j].style.display = "none";
             }
         }
+        var filesAndDirs = [];
+        function getFileFromEntryRecursively(entry) {
+            if (entry.isFile) {
+                entry.file(function (file) {
+                    file.mozFullPath = file.mozFullPath = entry.fullPath.replace(/^\/+/, "");
+                    filesAndDirs.push(file);
+                });
+            } else {
+                entry.createReader().readEntries(function (entries) { for (var i = 0; i < entries.length; i++) { getFileFromEntryRecursively(entries[i]); } });
+            }
+        }
 
         //拖动|粘贴；
         window.ondragover = function (e) { e.stopPropagation(); if (e && e.preventDefault) { e.preventDefault(); } else { window.event.returnValue = false; } return false; }
         window.ondrop = function (e) {
             e.stopPropagation();
-            loadCheck(e.dataTransfer.files, "poster");
-            loadCheck(e.dataTransfer.files, "subtitle");
-            getFiles(e.dataTransfer.files, true, false);
-            loadCheck(e.dataTransfer.files, "flash");
-            fileName.value = null;
+            var Isfolder = false; filesAndDirs = e.dataTransfer.files;
+            try {
+                var items = e.dataTransfer.items;
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].kind === "file") {
+                        if (!items[i].webkitGetAsEntry().isFile) { Isfolder = true; }
+                    }
+                }
+                if (Isfolder) { filesAndDirs = []; }
+                for (var i = 0; i < items.length; i++) {
+                    if (Isfolder && items[i].kind === "file") {
+                        getFileFromEntryRecursively(items[i].webkitGetAsEntry());
+                    }
+                }
+            } catch (e) { filesAndDirs = e.dataTransfer.files; }
+
+            setTimeout(function () {
+                loadCheck(filesAndDirs, "poster");
+                loadCheck(filesAndDirs, "subtitle");
+                getFiles(filesAndDirs, true, Isfolder);
+                loadCheck(filesAndDirs, "flash");
+                fileName.value = null;
+            }, Isfolder ? 2400 : 100);
             if (e && e.preventDefault) { e.preventDefault(); } else { window.event.returnValue = false; }
             return false;
         }
