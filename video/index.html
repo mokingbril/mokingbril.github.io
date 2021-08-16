@@ -148,7 +148,7 @@
             text-align:left;cursor:pointer;padding:2px 2px 1px 2px;border-radius:3px;display:inline-block;position:relative;box-shadow:0 0 3px #4D4B4B;overflow:hidden;width:55px;
             -webkit-transition:all .3s linear,color 0 linear;transition:all .3s linear,color 0 linear; -ms-transition:all .3s linear,color 0 linear;-moz-transition:all .3s linear,color 0 linear; -o-transition:all .3s linear,color 0 linear;
         }
-        input[type=checkbox]+label:after{content:' ';position:absolute;background:#fff;top:3px;right:5px;width:13px;height:13px;display:block;border-radius:3px;padding:0px;text-align:center;color:black;}
+        input[type=checkbox]+label:after{content:' ';position:absolute;background:#fff;top:3px;right:5px;width:13px;height:15px;display:block;border-radius:3px;padding:0px;text-align:center;color:black;}
         input[type=checkbox]:checked+label{color:#fff; font-weight:bold;}
         input[type=checkbox]+label>span{position:relative;z-index:999999;}
         input[type=checkbox]:checked+label:after{content:'\2715'; font-size:12px;}
@@ -216,9 +216,9 @@
                 <!--视频-->
                 <div id="ck_video"></div>
                 <video id="MyVideo" src="" width="800" height="500" autoplay preload="auto" poster="images/Poster.jpg" contextmenu="mymenu" data-setup="{}">
-                    <track kind="subtitles" src="字幕-中文.vtt" srclang="zh" label="Chinese" default="default">
-                    <track kind="subtitles" src="字幕-日语.vtt" srclang="ja" label="Japanese">
-                    <track kind="subtitles" src="字幕-英文.srt" srclang="en" label="English">                
+                    <track kind="subtitles" src="" srclang="zh" label="Chinese" default="default">
+                    <track kind="subtitles" srclang="ja" label="Japanese">
+                    <track kind="subtitles" srclang="en" label="English">
                 </video>
                 <!--控制工具栏-->
                 <div style="margin-bottom:5px;z-index:20;margin-top:-5px;position:absolute;width:100%;">
@@ -432,7 +432,7 @@
                     <p class="title" id="Mdown">
                         <span class="t1 label" lang="set">设置</span>
                         <span class="t2 mytitle" poshytip="no" lang="close" title="关闭" onclick="$('#Settings').css('display','none');">✖</span>
-                        <span class="t3 mytitle" lang="copyright" title="©おうき 版权所有">i</span>
+                        <span class="t3 mytitle" lang="copyright" title="©mokingbril 版权所有">i</span>
                     </p>
                     <div style="padding:0 10px 0 5px;">
                         <form id="myform">
@@ -2072,6 +2072,7 @@
                 }
             } catch (e) { filesAndDirs = e.dataTransfer.files; }
 
+	    showTip("Loading...");
             setTimeout(function () {
                 loadCheck(filesAndDirs, "poster");
                 loadCheck(filesAndDirs, "subtitle");
@@ -2185,7 +2186,7 @@
                     /*システムのニュース*/
                     loadData_error: "失败を挿入！请検査データのファイルの効果があるかどうか！", loadFlash_error: "失败を挿入！かどうかをチェックしてくださいアド有効だ！",
                     promptUrl: "URLを入力してください", promptPath: "入力してください。源フォルダ上級経路", playOver: "放映终了！",
-                    pageleaveMes: "このページを離れ確定か？【きちゃんの専属プレーヤー】", setSuccess: "執行の成功！",
+                    pageleaveMes: "このページを離れ確定か？【mokingbrilの専属プレーヤー】", setSuccess: "執行の成功！",
                     progress_error_0: "元素が初期の状态だ", progress_error_1: "すでに選択コーディング形式，インターネット接続なかっ！", loading: "积载で…", load_error: "积载失敗！",
                     error_1: "動画のダウンロード過程が中止された。", error_2: "インターネット故障，動画のダウンロード過程が中止された。", error_3: "復号化失敗！", error_4: "不支持の動画再生フォーマット！",
                     fileName: "ファイル名：", fileType: "ファイルタイプ：", fileSize: "ファイルの大きさ：",lastModifiedDate: "改正日程：", title: "タイトル：", artist: "芸术家：", album: "アルバム：", genre: "ジャンル：",
