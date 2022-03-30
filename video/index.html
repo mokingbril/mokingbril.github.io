@@ -810,6 +810,7 @@
             opened = true;
         }
         function Openfile() {
+            if (fileTypes["poster"].indexOf(myfiles[currentfile].img)>-1) { video.setAttribute("poster", myfiles[currentfile].url);return false;}
             video.playbackRate != 1 ? video.playbackRate = 1 : "";
             clearInterval(backtime); lastplaytimes(oldcurfile);
 
