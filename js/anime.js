@@ -74,6 +74,7 @@ $(function () {
         }
         $("#page .tag-cloud-list.is-center").append(tag_a_html);
     }
+    $("#footer-wrap .copyright").text($("#footer-wrap .copyright").text().replace("2021 By", "2023 By"));
 });
 
 /* 切换音乐频道 */
