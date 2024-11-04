@@ -157,7 +157,7 @@ if (asideStatus !== undefined) {
                 </div>
             </div>
         </main>
-        <footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 By mokingbril</div></div></footer>
+        <footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 By mokingbril</div></div></footer>
     </div>
     <div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div>
     <div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div></div><hr/><div id="local-search-results"><div id="local-hits"></div><div id="local-stats"><div class="local-search-stats__hr" id="hr"><span>由</span> <a target="_blank" rel="noopener" href="https://github.com/wzpan/hexo-generator-search" style="color:#49B1F5;">hexo-generator-search</a><span>提供支持</span></div></div></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div>
@@ -174,7 +174,9 @@ if (asideStatus !== undefined) {
 }
 window.addEventListener('load',()=> {preloader.endLoading()})</script>
 <!--评论-->
-<div class="js-pjax"><script>function loadValine () {
+<div class="js-pjax"><script>
+  try{
+  function loadValine () {
   function initValine () {
     let initData = {
       el: '#vcomment',
@@ -208,6 +210,8 @@ window.addEventListener('load',()=> {preloader.endLoading()})</script>
   if (typeof Valine === 'function') initValine() 
   else $.getScript('/cdn.jsdelivr.net/Valine.min.js', initValine)
 }
+}catch (e){}
+  
 try{
   if ('Valine' === 'Valine' || !false) {
   if (false) btf.loadComment(document.querySelector('#vcomment'),loadValine)
@@ -217,7 +221,7 @@ try{
     loadValine()
   }
 }
-}catch{}
+}catch (e){}
 </script>
 <!--<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>-->
 </div><div class="aplayer no-destroy" data-id="2665433348" data-server="netease" data-type="playlist" data-fixed="true" data-mini="true" data-listFolded="true" data-order="random" data-preload="none" data-autoplay="true" muted></div><script defer="defer" id="ribbon" src="/cdn.jsdelivr.net/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script id="click-heart" src="/cdn.jsdelivr.net/click-heart.min.js" async="async" mobile="false"></script><link rel="stylesheet" href="/cdn.jsdelivr.net/APlayer.min.css"><script src="/cdn.jsdelivr.net/APlayer.min.js"></script><script src="/cdn.jsdelivr.net/Meting.min.js"></script><script src="/cdn.jsdelivr.net/pjax.min.js"></script><script>let pjaxSelectors = [
