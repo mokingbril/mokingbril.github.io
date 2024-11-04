@@ -208,15 +208,17 @@ window.addEventListener('load',()=> {preloader.endLoading()})</script>
   if (typeof Valine === 'function') initValine() 
   else $.getScript('/cdn.jsdelivr.net/Valine.min.js', initValine)
 }
-
-if ('Valine' === 'Valine' || !false) {
+try{
+  if ('Valine' === 'Valine' || !false) {
   if (false) btf.loadComment(document.querySelector('#vcomment'),loadValine)
   else setTimeout(() => loadValine(), 0)
 } else {
   function loadOtherComment () {
     loadValine()
   }
-}</script>
+}
+}catch{}
+</script>
 <!--<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>-->
 </div><div class="aplayer no-destroy" data-id="2665433348" data-server="netease" data-type="playlist" data-fixed="true" data-mini="true" data-listFolded="true" data-order="random" data-preload="none" data-autoplay="true" muted></div><script defer="defer" id="ribbon" src="/cdn.jsdelivr.net/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script id="click-heart" src="/cdn.jsdelivr.net/click-heart.min.js" async="async" mobile="false"></script><link rel="stylesheet" href="/cdn.jsdelivr.net/APlayer.min.css"><script src="/cdn.jsdelivr.net/APlayer.min.js"></script><script src="/cdn.jsdelivr.net/Meting.min.js"></script><script src="/cdn.jsdelivr.net/pjax.min.js"></script><script>let pjaxSelectors = [
   'title',
