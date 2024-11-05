@@ -75,6 +75,7 @@ $(function () {
         $("#page .tag-cloud-list.is-center").append(tag_a_html);
     }
     $("#footer-wrap .copyright").text("© 2021-2024 By mokingbril");
+    setTimeout(function () {$(".v[data-class='v'] .vempty").hide();}, 5000);
 });
 
 /* 切换音乐频道 */
