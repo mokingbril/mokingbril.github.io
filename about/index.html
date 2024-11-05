@@ -176,6 +176,7 @@ window.addEventListener('load',()=> {preloader.endLoading()})</script>
 <!--评论-->
 <div class="js-pjax"><script>
   function loadValine () {
+  $.getScript("/js/anime.js");
   function initValine () {
     let initData = {
       el: '#vcomment',
@@ -203,13 +204,11 @@ window.addEventListener('load',()=> {preloader.endLoading()})</script>
       initData = Object.assign({}, initData, otherData)
     }
     
-    const valine = new Valine(initData)
+    try {const valine = new Valine(initData); } catch (e) {}
   }
 
-  try {
   if (typeof Valine === 'function') initValine() 
-  else $.getScript('/cdn.jsdelivr.net/Valine.min.js', initValine)
-  } catch (e) {}
+  else $.getScript('/cdn.jsdelivr.net/Valine.min.js', initValine)  
 }
   
 try{
