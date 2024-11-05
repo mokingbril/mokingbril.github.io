@@ -193,6 +193,7 @@ if (asideStatus !== undefined) {
   }
 }
 window.addEventListener('load',()=> {preloader.endLoading()})</script><div class="js-pjax"><script>function loadValine () {
+  $.getScript("/js/anime.js");
   function initValine () {
     let initData = {
       el: '#vcomment',
@@ -220,7 +221,7 @@ window.addEventListener('load',()=> {preloader.endLoading()})</script><div class
       initData = Object.assign({}, initData, otherData)
     }
     
-    const valine = new Valine(initData)
+    try { const valine = new Valine(initData); } catch (e) {}
   }
 
   if (typeof Valine === 'function') initValine() 
